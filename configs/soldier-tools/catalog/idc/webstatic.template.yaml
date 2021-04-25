@@ -1,0 +1,125 @@
+kind: Template
+apiVersion: v1
+metadata: 
+  name: webstatic-template
+  annotations:
+    openshift.io/display-name: "WebStatic"
+    description: "Deploy WebStatic"
+    tags: "js html css"
+    iconClass: icon-nodejs
+parameters: 
+  - name: "NAME"
+    displayName: "Name"
+    description: "The template name for generate api objects, must be accepted by k8s"
+    required: true
+    
+  - name: "REPLICAS_NUM"
+    displayName: "Replicas"
+    description: "Replicas number for deploy"
+    required: true
+    value: "2"
+
+  - name: "OPENSHIFT_PROJECT_NAME"
+    displayName: "The Openshift Project Name"
+    description: "The Openshift Project Name for your deployment"
+    required: true
+    
+  - name: "IMAGE_VERSION"
+    displayName: "ImageVersion"
+    description: "The Docker Image Version, like v1..."
+    required: true
+    value: "v1"
+    
+  - name: "MEMORY_REQUEST"
+    displayName: "Minimum memory"
+    description: "Minimum memory for your service"
+    required: true
+    value: "50Mi"
+    
+  - name: "MEMORY_LIMIT"
+    displayName: "Maximum memory"
+    description: "Maximum memory for your service"
+    required: true
+    value: "100Mi"
+    
+  - name: "CPU_REQUEST"
+    displayName: "Minimum cpu"
+    description: "Minimum cpu for your service"
+    required: true
+    value: "0.01"
+    
+  - name: "CPU_LIMIT"
+    displayName: "Maximum cpu"
+    description: "Maximum cpu for your service"
+    required: true
+    value: "0.5"
+
+  - name: "GENERIC_WEBHOOK_SECRET"
+    displayName: "Generic Webhook Secret"
+    description: "A secret string used to configure the Generic webhook."
+    generate: "expression"
+    from: "[a-zA-Z0-9]{40}"
+    
+message: "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template"
+labels: 
+  template: "webstatic-template"
+  app: "${NAME}"
+objects:  
+- kind: Service
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations:
+      description: "Exposes and load balances the application pods"
+  spec: 
+    ports: 
+    - port: 80
+      targetPort: 80
+    selector: 
+      name: "${NAME}"
+          
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+      description: "Defines how to deploy the application server"
+      template.alpha.openshift.io/wait-for-ready: "true"
+  spec: 
+    strategy: 
+      type: Rolling
+    triggers: 
+    - type: ConfigChange
+    replicas: ${REPLICAS_NUM}
+    selector: 
+      name: "${NAME}"
+    template: 
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        containers: 
+        - name: ${NAME}
+          image: "docker-registry.default.svc:5000/${OPENSHIFT_PROJECT_NAME}/${NAME}:${IMAGE_VERSION}"
+          ports:
+          - containerPort: 80
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            httpGet: 
+              path: "/"
+              port: 80
+          livenessProbe: 
+            timeoutSeconds: 3
+            initialDelaySeconds: 10
+            httpGet: 
+              port: 80
+              path: "/"
+          resources:
+            limits:
+              cpu: "${CPU_LIMIT}"
+              memory: "${MEMORY_LIMIT}"
+            requests:
+              cpu: "${CPU_REQUEST}"
+              memory: "${MEMORY_REQUEST}"

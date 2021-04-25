@@ -1,0 +1,14 @@
+if [ $1 -eq 0 ];then
+	# remove crontab
+	TMP_REMOVE_FILE=/tmp/crontab_remove_root
+	crontab -l -u root > ${TMP_REMOVE_FILE}
+	sed -i '/\/usr\/local\/soldier\/snginx\/watchdog.sh/d' ${TMP_REMOVE_FILE}
+	crontab -u root ${TMP_REMOVE_FILE}
+	rm -f ${TMP_REMOVE_FILE}
+
+	sed -i '/\/usr\/local\/soldier\/snginx$/d' /etc/profile
+
+	/usr/local/soldier/snginx/snginx stop
+	/usr/local/soldier/snginx/snginx_agent.sh stop
+fi
+

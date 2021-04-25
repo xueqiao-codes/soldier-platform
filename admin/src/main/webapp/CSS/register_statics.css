@@ -1,0 +1,25 @@
+@CHARSET "UTF-8";
+
+.col1,.col2,.col3,.col4,.col5,.col6,.col7{
+	border:1px solid;
+	text-align:center;
+	width:100px;
+}
+
+#begin_date,#end_date{
+	font-size:15px;
+	font-color:red;
+}
+
+#end_date{
+	margin-left:10px;
+}
+
+.table_content{
+	height:30px;
+}
+
+
+input{
+	margin-left:10px;
+}

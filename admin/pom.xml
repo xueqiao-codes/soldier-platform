@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.soldier.platform</groupId>
+  <artifactId>platform_admin</artifactId>
+  <packaging>war</packaging>
+  <version>1.0</version>
+  <name>admin for platform</name>
+  <dependencies>
+    <dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>servlet-api</artifactId>
+		<version>2.5</version>
+		<scope>provided</scope>
+	</dependency>
+	
+	<dependency>
+	    <groupId>org.soldier.platform</groupId>
+        <artifactId>libroute_agent_finder</artifactId>
+        <version>1.1-SNAPSHOT</version>
+    </dependency>
+	
+	<dependency>
+		<groupId>org.freemarker</groupId>
+		<artifactId>freemarker</artifactId>
+		<version>2.3.20</version>
+	</dependency>
+    
+    <dependency>
+		<groupId>com.antiy</groupId>
+		<artifactId>error_code</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</dependency>
+    
+    <dependency>
+    	<groupId>org.soldier.platform</groupId>
+    	<artifactId>libsvr_platform</artifactId>
+    	<version>1.6</version>
+    </dependency>
+    	
+	<dependency>
+		<groupId>dom4j</groupId>
+		<artifactId>dom4j</artifactId>
+		<version>1.6.1</version>
+	</dependency>
+    
+    
+    <dependency>
+    	<groupId>org.soldier.platform</groupId>
+    	<artifactId>libweb_framework</artifactId>
+    	<version>1.0-SNAPSHOT</version>
+    </dependency>   
+    
+    <dependency>
+		<groupId>commons-io</groupId>
+		<artifactId>commons-io</artifactId>
+		<version>2.4</version>
+	</dependency>
+	
+	<dependency>
+        <groupId>org.soldier.platform</groupId>
+        <artifactId>libdal_set</artifactId>
+        <version>1.1</version>
+    </dependency>
+	
+  </dependencies>
+  <build>
+  	<plugins>
+  		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+				  <source>1.8</source>
+				  <target>1.8</target>
+				  <compilerArgument>-Xlint:all</compilerArgument>
+				  <showWarnings>true</showWarnings>
+				  <encoding>utf-8</encoding>
+				  <showDeprecation>true</showDeprecation>
+				</configuration>
+		</plugin>
+	</plugins>
+  </build>
+</project>

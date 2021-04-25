@@ -1,0 +1,37 @@
+kind: Template
+apiVersion: v1
+metadata: 
+  name: service-alias-template
+  annotations:
+    openshift.io/display-name: "Service Alias"
+    description: "Service Alias for export!!!"
+    iconClass: icon-load-balancer
+parameters: 
+  - name: "SERVICE_KEY"
+    displayName: "Service Key"
+    description: "The Service Key"
+    required: true
+    
+  - name: "SERVICE_PROJECT_NAME"
+    displayName: "Service Project Name"
+    description: "The service project name of deployed"
+    required: true
+    
+  - name: "SERVICE_NAME"
+    displayName: "Service Name"
+    description: "The service name in the project"
+    required: true
+    
+    
+message: "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template"
+labels: 
+  template: "service-alias-template"
+  app: "cmd${SERVICE_KEY}"
+objects:
+- kind: Service
+  apiVersion: v1
+  metadata: 
+    name: "cmd${SERVICE_KEY}"
+  spec: 
+    type: ExternalName
+    externalName: "${SERVICE_NAME}.${SERVICE_PROJECT_NAME}.svc.cluster.local"

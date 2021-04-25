@@ -1,0 +1,18 @@
+安装平台组件需要的zookeeper和zk-ui
+
+安装qconf-agent
+
+安装route-agent
+
+安装平台组件的rds，并初始化表结构
+
+安装machine_manage_bo, 利用generate-dal-set作为初始化容器进行dal-set的初始化
+
+安装route_dao, 利用generate-dal-set作为初始化容器进行dal-set的初始化
+
+安装dal_set_dao, 利用generate-dal-set作为初始化容器进行dal-set的初始化
+
+安装平台admin，将初始的平台配置导入配置中心, 观察route-agent是否可以正常拉取路由信息
+
+安装dal-set-agent, 观察是否可以正常拉取dal-set信息
+

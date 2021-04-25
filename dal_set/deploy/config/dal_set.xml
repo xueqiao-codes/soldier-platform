@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<dalset>
+  <hosts>
+	<!-- TO BE CONFIGURATION -->
+    <host name="PlatformDb" ip="10.0.0.5" port="3306" desc="平台DB机"/>
+  </hosts>
+  <users>
+    <!-- TO BE CONFIGURATION -->
+    <user id="platform_user" name="platform_user" password="platform@user" desc="platform db"/>
+  </users>
+  <dbInstances>
+    <db name="platform" drive="Mysql" rolename="platform" desc="平台组件基本角色">
+      <sets>
+        <set index="0">
+          <master host="PlatformDb" weight="1"/>
+        </set>
+      </sets>
+      <tables>
+        <table prefix="tallocid_bysect" sliceNum="0" fillZero="false" desc="平台IdMaker信息表"/>
+        <table prefix="tdal_set_host" sliceNum="0" fillZero="false" desc="dal_set主机表"/>
+        <table prefix="tdal_set_role" sliceNum="0" fillZero="false" desc="dal_set角色表"/>
+        <table prefix="tdal_set_role_service_relation" sliceNum="0" fillZero="false" desc="角色服务关联表"/>
+        <table prefix="tdal_set_role_set_relation" sliceNum="0" fillZero="false" desc="dal_set角色SET关联表"/>
+        <table prefix="tdal_set_role_table_relation" sliceNum="0" fillZero="false" desc="dal_set角色表关联表"/>
+        <table prefix="tdal_set_table" sliceNum="0" fillZero="false" desc="dal_set表信息描述表"/>
+        <table prefix="tdal_set_user" sliceNum="0" fillZero="false" desc="dal_set用户表"/>
+		<table prefix="tdal_set_description" sliceNum="0" fillZero="false" desc="dal_set描述表"/>
+        <table prefix="troute_info" sliceNum="0" fillZero="false" desc="平台路由信息表"/>
+        <table prefix="troute_version" sliceNum="0" fillZero="false" desc="平台路由版本信息表"/>
+      </tables>
+    </db>
+  </dbInstances>
+  <relations>
+    <relation serviceName="11" roleName="platform" userId="platform_user" dbType="NoType"/>
+    <relation serviceName="18" roleName="platform" userId="platform_user" dbType="NoType"/>
+    <relation serviceName="20" roleName="platform" userId="platform_user" dbType="NoType"/>
+  </relations>
+</dalset>

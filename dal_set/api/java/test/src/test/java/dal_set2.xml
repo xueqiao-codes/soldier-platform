@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<dalset>
+  <hosts>
+    <host name="test" ip="10.0.0.3" port="3306" desc="sdfsdf\nsdf2&lt;&gt;"/>
+    <host name="TestDaoSetHost" ip="10.0.0.5" port="3307" desc="测试的DB机,呵呵测试"/>
+    <host name="EpowerDb" ip="10.0.0.5" port="3306" desc="唯一的一台DB机"/>
+    <host name="AddOneTest" ip="db.epower.com" port="3306" desc="测试增加一台DB机"/>
+  </hosts>
+  <users>
+    <user id="epower_user" name="epower_user" password="uqUYOlRq3NEfcDML7PYK7g==" desc="用户DB的登录用户"/>
+    <user id="epower_platform" name="epower_platform" password="uqUYOlRq3NEfcDML7PYK7g==" desc="platform for epower db"/>
+    <user id="TestUserKey" name="testUserName" password="QfnE/EEcGP0WqTmAefGqCw==" desc="这是一个测试的用户"/>
+  </users>
+  <dbInstances>
+    <db name="test_db" drive="Mysql" rolename="dal_set_test" desc="测试的一个角色">
+      <sets/>
+      <tables/>
+    </db>
+    <db name="platform" drive="Mysql" rolename="platform" desc="平台组件基本角色">
+      <sets>
+        <set index="0">
+          <master host="EpowerDb" weight="1"/>
+          <slave index="0" host="test" weight="2"/>
+          <slave index="1" host="TestDaoSetHost" weight="1"/>
+        </set>
+      </sets>
+      <tables>
+        <table prefix="tallocid_bysect" sliceNum="0" fillZero="false" desc="平台IdMaker信息表"/>
+        <table prefix="tdal_set_description" sliceNum="0" fillZero="false" desc="dal_set描述表"/>
+        <table prefix="tdal_set_host" sliceNum="0" fillZero="false" desc="dal_set主机表"/>
+        <table prefix="tdal_set_role" sliceNum="0" fillZero="false" desc="dal_set角色表"/>
+        <table prefix="tdal_set_role_service_relation" sliceNum="0" fillZero="false" desc="角色服务关联表"/>
+        <table prefix="tdal_set_role_set_relation" sliceNum="0" fillZero="false" desc="dal_set角色SET关联表"/>
+        <table prefix="tdal_set_role_table_relation" sliceNum="0" fillZero="false" desc="dal_set角色表关联表"/>
+        <table prefix="tdal_set_table" sliceNum="0" fillZero="false" desc="dal_set表信息描述表"/>
+        <table prefix="tdal_set_user" sliceNum="0" fillZero="false" desc="dal_set用户表"/>
+        <table prefix="troute_info" sliceNum="0" fillZero="false" desc="平台路由信息表"/>
+        <table prefix="troute_version" sliceNum="0" fillZero="false" desc="平台路由版本信息表"/>
+      </tables>
+    </db>
+    <db name="user" drive="Mysql" rolename="user" desc="用户基础信息角色">
+      <sets>
+        <set index="0">
+          <master host="EpowerDb" weight="1"/>
+        </set>
+      </sets>
+      <tables>
+        <table prefix="tuser_" sliceNum="1" fillZero="false" desc="用户基本信息表"/>
+      </tables>
+    </db>
+  </dbInstances>
+  <relations>
+    <relation serviceName="DaemonTest" roleName="dal_set_test" userId="TestUserKey" dbType="Master"/>
+    <relation serviceName="11" roleName="platform" userId="epower_platform" dbType="NoType"/>
+    <relation serviceName="11_hehe" roleName="platform" userId="epower_platform" dbType="NoType"/>
+    <relation serviceName="18" roleName="platform" userId="epower_platform" dbType="NoType"/>
+    <relation serviceName="20" roleName="platform" userId="epower_platform" dbType="NoType"/>
+    <relation serviceName="900" roleName="user" userId="epower_user" dbType="NoType"/>
+    <relation serviceName="1998" roleName="dal_set_test" userId="TestUserKey" dbType="NoType"/>
+  </relations>
+</dalset>

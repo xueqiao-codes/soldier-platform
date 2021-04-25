@@ -1,0 +1,14 @@
+if [ $1 -eq 0 ];then
+	#rm -f /usr/local/soldier/svr_platform/auto_restart.sh
+
+	/usr/local/soldier/svr_platform/service.sh stop all
+	/usr/local/soldier/svr_platform/daemon.sh stop all
+	
+	sed -i '/\/usr\/local\/soldier\/svr_platform$/d' /etc/profile
+	
+	TMP_REMOVE_FILE=/tmp/crontab_remove_epower
+	crontab -l -u epower > ${TMP_REMOVE_FILE}
+	sed -i '/\/usr\/local\/soldier\/svr_platform\/cleanup.sh/d' ${TMP_REMOVE_FILE}
+	crontab -u epower ${TMP_REMOVE_FILE}
+	rm -f ${TMP_REMOVE_FILE}
+fi

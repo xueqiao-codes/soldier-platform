@@ -1,0 +1,3 @@
+{
+	"maxSetIndex" : ${maxSetIndex?c}
+}

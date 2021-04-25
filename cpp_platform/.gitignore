@@ -1,0 +1,13 @@
+/out
+*.pyc
+*.class
+.settings/
+.project
+.cproject
+.pydevproject
+.classpath
+.vs/
+target/
+.idea
+*.iml
+*.so

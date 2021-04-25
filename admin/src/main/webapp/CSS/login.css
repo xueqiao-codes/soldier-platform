@@ -1,0 +1,28 @@
+@CHARSET "UTF-8";
+
+body{
+	margin-top : 20px;
+	background-image : url(../IMAGE/login_bg.jpg);
+	background-repeat : repeat-x;
+}
+
+td{
+	margin-right : 5px;
+}
+
+#TopSpace{
+	height : 80px;
+}
+
+#LoginInput,#bd{
+	margin : auto;
+    width : 400px;
+}
+
+#bd{
+	background:url(../IMAGE/login_bd.gif) repeat-y fixed top;
+	padding-top:10px;
+	padding-bottom:10px;
+	border:1px;
+	border-radius:15px;
+}

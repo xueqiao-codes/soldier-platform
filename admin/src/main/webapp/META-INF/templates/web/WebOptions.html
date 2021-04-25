@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="${static_url}/CSS/common.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/flexigrid/css/flexigrid.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" type="text/css" />
+<title>Web项目选项</title>
+</head>
+<body>
+<div style="background-color:blue;height:30px;text-align:center;">
+<font color="white"><h3 >${webConfig.webProjectName!}项目块配置</h3></font>
+</div>
+<div style="width:50%;float:left">
+<div>
+	<div><label>Server块</label></div>
+	<div><textarea id="serverOptions" style="width:90%;overflow:auto;margin:5px" rows="30">${webConfig.serverOptions!}</textarea></div>
+</div>
+</div>
+<div style="width:50%;float:left">
+	<div><label>Location块</label></div>
+	<div><textarea id="locationOptions" style="width:90%;overflow:auto;margin:5px" rows="30">${webConfig.locationOptions!}</textarea></div>
+</div>
+<div>
+<input type="button" value="保存" onclick="javascript:saveConfig()" ></input>
+</div>
+</body>
+<script type="text/javascript" src="${static_url}/JS/jquery-1.7.2.min.js" ></script>
+<script type="text/javascript" src='${static_url}/JS/jquery.noty.min.js'></script>
+<script type="text/javascript">
+<#include "comm/WebComm.js">
+
+function saveConfig() {
+	var serverOptions = $('#serverOptions').val();
+	var locationOptions = $('#locationOptions').val();
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 20000,
+		data: {
+			project : "${webConfig.webProjectName!}",
+			serverOptions : serverOptions,
+			locationOptions : locationOptions
+		},
+		url : "${base_url}/WebManage/saveWebOptions",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				showMsg("保存成功");
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500 || request.status == 404) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+
+</script>
+</html>

@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dal-set-agent
+spec:
+  selector:
+    matchLabels:
+      name: dal-set-agent
+  template:
+    metadata:
+      labels:
+        name: dal-set-agent
+    spec:
+      hostIPC: true
+      nodeSelector:
+        network.db.permit: 'true'
+      tolerations:
+        - effect: NoExecute
+          key: xueqiao.quotation.access
+          operator: Equal
+          value: 'true'
+        - effect: NoExecute
+          key: xueqiao.quotation.race
+          operator: Equal
+          value: 'true'
+        - effect: NoExecute
+          key: xueqiao.trade.hosting
+          operator: Equal
+          value: 'true'
+      containers:
+      - name: dal-set-agent
+        image: docker-registry.default.svc:5000/soldier-platform/dal-set-agent:1.0
+        env:
+        - name: APPLOG_STDOUT_MODE
+          value: 'true'
+        resources:
+          limits:
+            cpu: 500m
+            memory: 100Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
+        volumeMounts:
+        - name: data
+          mountPath: /usr/local/soldier/dal_set/data
+        - name: config
+          mountPath: /usr/local/soldier/dal_set/config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        hostPath:
+          path: /usr/local/soldier/dal_set/config
+          type: DirectoryOrCreate

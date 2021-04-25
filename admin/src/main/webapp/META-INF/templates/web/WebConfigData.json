@@ -1,0 +1,24 @@
+{
+	"page": ${pageIndex + 1},
+	"total": ${itemsResult.totalCount},
+	<#assign rownum=0 />
+	"rows":[
+		<#list itemsResult.configList as item >
+		<#if rownum &gt; 0>,</#if>
+		{
+			"webProjectName":"${item.webProjectName}",
+			"deployType":"${item.deployType}",
+			"backendList":"${backendList2Str(item.backendList)}",
+			"port": ${item.port?c},
+			"domain":"${domainList2Str(item.domainList)}",
+			"indexPath":"${item.indexPath}",
+			"remark":"${item.desc?js_string}",
+			"httpsCertName": "${item.httpsCertName?js_string}",
+			"disableHttp": ${item.disableHttp?string},
+			"createTime":"${fromUnixTimestamp(item.createTimestamp)}",
+			"lastmodifyTime":"${fromUnixTimestamp(item.lastmodifyTimestamp)}"
+		}
+		<#assign rownum=rownum+1 />
+		</#list>
+	]
+}

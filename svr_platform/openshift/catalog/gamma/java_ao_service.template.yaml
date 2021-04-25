@@ -1,0 +1,194 @@
+kind: Template
+apiVersion: v1
+metadata: 
+  name: java-ao-service-template
+  annotations:
+    openshift.io/display-name: "Java Ao Service"
+    description: "Java service based on soldier platform! Can not access out network!"
+    tags: "Java"
+    iconClass: icon-openjdk
+parameters: 
+  - name: "NAME"
+    displayName: "Name"
+    description: "The template name for generate api objects, must be accepted by k8s"
+    required: true
+
+  - name: "SERVICE_PORT"
+    displayName: "Service Port"
+    description: "The service port to export, value = 10000 + serviceKey"
+    required: true
+    
+  - name: "REPLICAS_NUM"
+    displayName: "Replicas"
+    description: "Replicas number for deploy"
+    required: true
+    value: "1"
+    
+  - name: "SOURCE_GROUP_NAME"
+    displayName: "Git Group Name"
+    description: "Please input the git group name"
+    required: true
+  
+  - name: "SOURCE_REPOSITORY_NAME"
+    displayName: "Git Repository Name"
+    description: "Name of the repository with your application source code."
+    required: true
+  
+  - name: "SOURCE_REPOSITORY_REF"
+    displayName: "Git Reference"
+    description: "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
+    required: true
+    value: "gamma"
+    
+  - name: "CONTEXT_DIR"
+    displayName: "Context Directory"
+    description: "Set this to the relative path to your project if it is not in the root of your repository."
+    value: "java"
+    
+  - name: "MEMORY_REQUEST"
+    displayName: "Minimum memory"
+    description: "Minimum memory for your service"
+    required: true
+    value: "100Mi"
+    
+  - name: "MEMORY_LIMIT"
+    displayName: "Maximum memory"
+    description: "Maximum memory for your service"
+    required: true
+    value: "200Mi"
+    
+  - name: "CPU_REQUEST"
+    displayName: "Minimum cpu"
+    description: "Minimum cpu for your service"
+    required: true
+    value: "0.05"
+    
+  - name: "CPU_LIMIT"
+    displayName: "Maximum cpu"
+    description: "Maximum cpu for your service"
+    required: true
+    value: "0.5"
+
+  - name: "GENERIC_WEBHOOK_SECRET"
+    displayName: "Generic Webhook Secret"
+    description: "A secret string used to configure the Generic webhook."
+    generate: "expression"
+    from: "[a-zA-Z0-9]{40}"
+    
+message: "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template"
+labels: 
+  template: "java-ao-service-template"
+  app: "${NAME}"
+objects:
+- kind: Service
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations:
+      description: "Exposes and load balances the application pods"
+  spec: 
+    ports: 
+    - name: "${NAME}-port"
+      port: ${{SERVICE_PORT}}
+      targetPort: ${{SERVICE_PORT}}
+    selector: 
+      name: "${NAME}"
+  
+- kind: ImageStream
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+     description: "Keeps track of changes in the application image"
+
+- kind: BuildConfig
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+      description: "Defines how to build ${NAME}"
+      template.alpha.openshift.io/wait-for-ready: "true"
+  spec: 
+    nodeSelector:
+      node-role.soldier.platform/builder: 'true'
+    source: 
+      type: "Git"
+      git: 
+         uri: "ssh://git@git.soldier-tools.svc:29418/${SOURCE_GROUP_NAME}/${SOURCE_REPOSITORY_NAME}.git"
+         ref: "${SOURCE_REPOSITORY_REF}"
+      sourceSecret:
+         name: xueqiao-git
+      contextDir: "${CONTEXT_DIR}"
+    strategy: 
+      type: Source
+      sourceStrategy:
+        from: 
+          kind: ImageStreamTag
+          namespace: soldier-platform
+          name: java-svrbuilder:latest
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:latest"
+    triggers: 
+    - type: ImageChange
+    - type: ConfigChange
+    - type: Generic
+      generic: 
+        secret: "${GENERIC_WEBHOOK_SECRET}"
+    
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+      description: "Defines how to deploy the application server"
+      template.alpha.openshift.io/wait-for-ready: "true"
+  spec: 
+    strategy: 
+      type: Rolling
+    triggers: 
+    - type: ImageChange
+      imageChangeParams: 
+        automatic: true
+        containerNames: 
+        - ${NAME}
+        from:
+          kind: ImageStreamTag
+          name: "${NAME}:latest"
+    - type: ConfigChange
+    replicas: ${REPLICAS_NUM}
+    selector: 
+      name: "${NAME}"
+    template: 
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        hostIPC: true 
+        containers: 
+        - name: ${NAME}
+          image: " "
+          ports:
+          - containerPort: ${SERVICE_PORT}
+          env:
+          - name: APPLOG_STDOUT_MODE
+            value: 'true'
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            tcpSocket: 
+              port: ${{SERVICE_PORT}}
+          livenessProbe: 
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            tcpSocket: 
+              port: ${{SERVICE_PORT}}
+          resources:
+            limits:
+              cpu: "${CPU_LIMIT}"
+              memory: "${MEMORY_LIMIT}"
+            requests:
+              cpu: "${CPU_REQUEST}"
+              memory: "${MEMORY_REQUEST}"

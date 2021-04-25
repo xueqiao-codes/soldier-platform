@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="${static_url}/CSS/common.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/flexigrid/css/flexigrid.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" type="text/css" />
+<title>同步Nginx</title>
+</head>
+<body style="margin:5px">
+<div style="float:left; width:20%; margin-bottom:10px">
+<label style="font-size:15px">同步log:</label>
+</div>
+<div>
+<textarea id="log" style="width:90%;overflow:auto" rows="15"></textarea>
+</div>
+<div>
+<input type="button" onclick="javascript:syncConfig('increment')" value="增量同步"></input>
+<input type="button" onclick="javascript:syncConfig('all')" value="强制全量"></input>
+</div>
+<div style="margin-top:10px;font-size:15px">
+增量同步: 只会同步消费者和生产者标记为未同步状态的配置<br/>
+强制全量: 会强制同步所有消费者和生产者的配置，同步时间长，需要运维确认执行
+</div>
+</body>
+<script type="text/javascript" src="${static_url}/JS/jquery-1.7.2.min.js" ></script>
+<script type="text/javascript" src='${static_url}/JS/jquery.noty.min.js'></script>
+<script>
+function showMsg(msg) {
+	noty({text : msg, timeout : 1500});
+}
+
+function syncConfig(mode) {
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 30000,
+		data: {},
+		url : "${base_url}/MsgQSyncManage/syncConfig?mode=" + mode,
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				showMsg("同步成功");
+			} else {
+				showMsg(result.errorMsg);
+			}
+			$('#log').val(result.log);
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500 || request.status == 404) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+</script>
+</html>

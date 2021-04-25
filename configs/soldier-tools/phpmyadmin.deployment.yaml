@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin-deploy
+  namespace: soldier-tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - env:
+            - name: PMA_ARBITRARY
+              value: '1'
+          image: 'docker-registry.default.svc:5000/soldier-tools/phpmyadmin:4.7'
+          imagePullPolicy: Always
+          name: phpmyadmin
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources: {}
+      nodeSelector:
+        network.db.permit: 'true'

@@ -1,0 +1,25 @@
+kind: List
+apiVersion: v1
+items: 
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: maven
+    namespace: soldier-tools
+  spec:
+    clusterIP: None
+    ports:
+     - port: 8081
+       protocol: TCP
+       targetPort: 8081
+    type: ClusterIP
+- kind: Endpoints
+  apiVersion: v1
+  metadata:
+    name: maven
+    namespace: soldier-tools
+  subsets:
+  - addresses:
+    - ip: 192.168.0.214
+    ports:
+    - port: 8081

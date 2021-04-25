@@ -1,0 +1,37 @@
+.item {
+  padding: 6px;
+  cursor: hand;
+  cursor: pointer;
+  margin-left: 8px;
+  margin-right: 8px;
+  border-bottom: 1px solid #ffffff;
+}
+
+.item-a {
+  color: #128CD6;
+  font-size: 12px;
+}
+
+.item-hover {
+  background-color: #B9D3EE;
+}
+
+.item-active {
+  background-color: #B9D3EE;
+}
+
+.item-a-hover {
+  color: #545454; 
+}
+
+.item-a-active {
+  color: #545454; 
+}
+
+a:link { 
+  text-decoration: none; 
+}
+
+a:visited { 
+  text-decoration: none; 
+}

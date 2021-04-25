@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="${static_url}/CSS/depot.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" type="text/css" />
+</head>
+<body>
+</head>
+<body id="channel" class="module_manage">
+	<div class="list_header">
+		<div class="title">
+			<span>系统菜单管理</span>
+		</div>
+		<div class="action">
+			<a href="javascript:addSystemMenu()">+添加菜单</a>
+		</div>
+	</div>
+	<div class="list_containter">
+		<table id="channel-table">
+			<tr>
+				<th>菜单名称</th>
+				<th>排序值</th>
+				<th>创建时间</th>
+				<th>修改时间</th>
+				<th>操作</th>
+			</tr>
+			<#list systemMenus as systemMenu>
+			<#if systemMenu_index %2 == 0>
+				<tr class="odd" id="systemMenu_${systemMenu.systemMenuId?c}">
+			<#else>
+				<tr class="even" id="systemMenu_${systemMenu.systemMenuId?c}">
+			</#if>
+				<td>${systemMenu.systemMenuName}</td>
+				<td>${systemMenu.orderWeight?c}</td>
+				<td>${fromUnixTimestamp(systemMenu.createTimestamp)}</td>
+				<td>${fromUnixTimestamp(systemMenu.lastmodifyTimestamp)}</td>
+				<td>
+					<a href="${base_url}/OaMenu/showSubMenus?systemMenuId=${systemMenu.systemMenuId?c}"><span>子菜单</span></a>
+					&nbsp;&nbsp;
+					<a href="javascript:updateSystemMenu(${systemMenu.systemMenuId?c})"><span>更新</span></a>
+					&nbsp;&nbsp;
+					<a href="javascript:deleteSystemMenu(${systemMenu.systemMenuId?c})"><span>删除</span></a>
+				</td>
+			</tr>
+			</#list>
+		</table>
+	</div>
+	
+	<!-- dialog -->
+	<div id="dialog-form">
+		<p class="validateTips">必须填写名称</p>
+
+		<form id="systemMenuForm">
+			<input type="hidden" name="menuId" />
+			<fieldset>
+				<label for="name">名称</label>
+				<input type="text" name="menuName" class="text ui-widget-content ui-corner-all" />
+				<br/><br/>
+				<lable for="weight">排序值</lable>
+				<input type="text" name="menuWeight" class="text ui-widget-content ui-corner-all" />
+			</fieldset>
+		</form>
+	</div>
+</body>
+
+<script type="text/javascript" src="${static_url}/JS/jquery-1.7.2.min.js" ></script>
+<script type="text/javascript" src="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.js" ></script>
+<script type='text/javascript' src='${static_url}/JS/jquery.noty.min.js'></script>
+<script type="text/javascript">
+function openDialog() {
+	$("#dialog-form").dialog("open");
+}
+
+function closeDialog() {
+	$("#dialog-form").dialog("close");
+}
+
+function showMsg(msg) {
+	noty({text : msg, timeout : 1500});
+}
+
+function getRowValue(row, index) {
+	return row.children('td').eq(index).html();
+}
+
+function deleteSystemMenu(menuId) {
+	if (confirm('[子菜单也会同时删除]确认删除系统菜单 ' + getRowValue($('#systemMenu_' + menuId), 0))) {
+		$.ajax({
+			type : "POST",
+			dataType : "json",
+			timeout : 3000,
+			data:{
+				menuId : menuId,
+			},
+			url : "${base_url}/OaMenu/deleteSystemMenu",
+			async : false,
+			success : function(result){
+				if(result.errorCode == 0){
+					location.reload();
+				} else {
+					showMsg(result.errorMsg);
+				}
+			},
+			error : function(request, textStatus, errorThrown) {
+				if (request.status >= 500) {
+					showMsg('服务器繁忙，请重试');
+				} else {
+					showMsg('连接服务器失败, 请检查网络');
+				}
+			}
+		});
+	}
+}
+
+function addSystemMenu() {
+	$('#systemMenuForm')[0].reset();
+	$('input[name=menuId]').val('');
+	$('#dialog-form').dialog('option', 'title', "增加系统菜单");
+	
+	openDialog();
+}
+
+function updateSystemMenu(menuId) {
+	var row = $('#systemMenu_' + menuId);
+	$('input[name=menuId]').val(menuId);
+	$('input[name=menuName]').val(getRowValue(row, 0));
+	$('input[name=menuWeight]').val(getRowValue(row, 1));
+	$('#dialog-form').dialog('option', 'title', "修改系统菜单");
+	
+	openDialog();
+}
+
+function doAddSystemMenu() {
+	var systemMenuName = $('input[name=menuName]').val();
+	if (systemMenuName == "") {
+		showMsg("请填写系统菜单名称");
+		return ;
+	}
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data: $('#systemMenuForm').serialize(),
+		url : "${base_url}/OaMenu/addSystemMenu",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				location.reload();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+function doUpdateSystemMenu() {
+	var menuId = $('input[name=menuId]').val();
+	if (menuId <= 0 ){
+		showMsg('请选中明确的菜单');
+		return ;
+	}
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data: $('#systemMenuForm').serialize(),
+		url : "${base_url}/OaMenu/updateSystemMenu",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				location.reload();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+$(document).ready(
+	function() {
+		$('#dialog-form').dialog({
+			hide:'',   
+        	autoOpen:false,
+        	width: 380,
+        	height: 300,
+        	modal:true, //蒙层
+			overlay: {
+            	opacity: 0.5,
+            	background: "black"
+        	},
+        	buttons:{
+            	'提交':function(){
+            		if ($('input[name=menuId]').val() == '') {
+                		doAddSystemMenu();
+                	} else {
+                		doUpdateSystemMenu();
+                	}
+            	},
+            	'取消':function(){
+                	$(this).dialog("close");
+            	},
+        	}
+		});
+	
+	}
+);
+
+</script>
+
+</html>

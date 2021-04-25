@@ -1,0 +1,25 @@
+kind: List
+apiVersion: v1
+items: 
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: git
+    namespace: soldier-tools
+  spec:
+    clusterIP: None
+    ports:
+     - port: 8080
+       protocol: TCP
+       targetPort: 8080
+    type: ClusterIP
+- kind: Endpoints
+  apiVersion: v1
+  metadata:
+    name: git
+    namespace: soldier-tools
+  subsets:
+  - addresses:
+    - ip: 192.168.0.215
+    ports:
+    - port: 8080

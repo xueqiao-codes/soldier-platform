@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: route-agent
+spec:
+  selector:
+    matchLabels:
+      name: route-agent
+  template:
+    metadata:
+      labels:
+        name: route-agent
+    spec:
+      hostIPC: true
+      tolerations:
+        - effect: NoExecute
+          key: xueqiao.quotation.access
+          operator: Equal
+          value: 'true'
+        - effect: NoExecute
+          key: xueqiao.quotation.race
+          operator: Equal
+          value: 'true'
+        - effect: NoExecute
+          key: xueqiao.trade.hosting
+          operator: Equal
+          value: 'true'
+      containers:
+      - name: route-agent
+        image: docker-registry.default.svc:5000/soldier-platform/route-agent
+        env:
+        - name: DISABLE_TICK_WORKER
+          value: "1"
+        - name: APPLOG_STDOUT_MODE
+          value: "true"
+        volumeMounts:
+        - name: data
+          mountPath: /usr/local/soldier/route_agent/data
+        resources:
+          limits:
+            cpu: 50m
+            memory: 50Mi
+          requests:
+            cpu: 1m
+            memory: 20Mi
+      volumes:
+      - name: data
+        emptyDir: {}
+      

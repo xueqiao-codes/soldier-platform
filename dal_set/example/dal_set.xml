@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dalset>
+<hosts>
+	<host name="cly_db" ip="127.0.0.1" port="3306" desc="唯一的一台DB机" />
+</hosts>
+<users>
+	<user id="clyuser" name="clyuser" password="clyuser@mysql" desc="唯一的用户" />
+</users>
+<dbInstances>
+	<db name="user" drive="mysql" rolename="cly_location" desc="用户位置DB存储" >
+		<sets>
+			<set index="0">
+				<master host="cly_db" weight="5" />
+				<slave host="cly_db" index="0" weight="10" />
+			</set>
+			<set index="1">
+			    <master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tuser_place" sliceNum="1"  fillZero="false"  desc="用户位置表" />
+		</tables>
+	</db>
+	<db name="config" drive="mysql" rolename="cly_platform" desc="平台DB关联" >
+		<sets>
+			<set index="0">
+				<master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="t_route_info" sliceNum="1" fillZero="false" desc="路由表" />
+			<table prefix="tallocid_bysect" sliceNum="1" fillZero="false" desc="Id分配表" />
+			<table prefix="t_dal_set_host" sliceNum="1" fillZero="false" desc="DB机器表" />
+			<table prefix="t_dal_set_relation" sliceNum="1" fillZero="false" desc="关系映射表" />
+		    <table prefix="t_dal_set_role" sliceNum="1" fillZero="false" desc="DalSet角色表" />
+		    <table prefix="t_dal_set_user" sliceNum="1" fillZero="false" desc="用户表" />
+		</tables>
+	</db>
+	<db name="question" drive="mysql" rolename="cly_question" desc="求助求助问题DB关联" >
+		<sets>
+			<set index="0">
+				<master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tloc_question_" sliceNum="128" fillZero="false" desc="问题表" />
+			<table prefix="tloc_answer_" sliceNum="128" fillZero="false" desc="答案表" />
+		</tables>
+	</db>
+	<db name="user" drive="mysql" rolename="cly_user" desc="用户信息DB">
+		<sets>
+			<set index="0">
+				<master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tuser_info_" sliceNum="128" fillZero="false" desc="用户信息表" />
+			<table prefix="tuser_auth_" sliceNum="128" fillZero="false" desc="用户健全密码表"/>
+			<table prefix="tuser_collect_" sliceNum="128" fillZero="false" desc="外站连接用户表" />
+		</tables>
+	</db>
+	<db name="user" drive="mysql" rolename="cly_session" desc="用户session管理表">
+		<sets>
+			<set index="0">
+				<master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tsession" sliceNum="1" fillZero="false" desc="用户session表" />
+		</tables>
+	</db>
+	<db name="boss" drive="mysql" rolename="cly_boss" desc="boss统计" >
+		<sets>
+			<set index="0">
+				<master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tregister_users" sliceNum="1" fillZero="false" desc="注册用户统计表" />
+		</tables>
+	</db>
+	<db name="question" drive="mysql" rolename="cly_question_help" desc="别人求助问题" >
+		<sets>
+			<set index="0" >
+				<master host="cly_db" />
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tloc_question_other_" sliceNum="512" fillZero="false" desc="问题描述表" />
+		</tables>
+	</db>
+</dbInstances>
+<relations>
+	<relation serviceName="500" roleName="cly_location" 
+			  userId="clyuser" dbType="master" desc="PushService" />
+	<relation serviceName="200" roleName="cly_platform" 
+			  userId="clyuser" dbType="master" desc="IdMaker" />
+	<relation serviceName="302" roleName="cly_question" 
+			  userId="clyuser" dbType="master" desc="QuestionDao" />
+	<relation serviceName="300" roleName="cly_user"
+			  userId="clyuser" dbType="master" desc="UserDao" />
+	<relation serviceName="301" roleName="cly_session"
+			  userId="clyuser" dbType="master" desc="SessionDao" />
+	<relation serviceName="800" roleName="cly_question_help"
+			  userId="clyuser" dbType="master" desc="HelpQuestionDao" />
+	
+	<!-- daemon关联配置 -->
+	<relation serviceName="user_static_daemon" roleName="cly_user"
+			  userId="clyuser" dbType="master" desc="用户统计daemon关联" />
+	<relation serviceName="boss_writer_daemon" roleName="cly_boss"
+			  userId="clyuser" dbType="master" desc="boss写daemon关联" />
+			  
+	<!-- 管理控制台控制 -->
+	<relation serviceName="ClyAdmin" roleName="cly_location" 
+			  userId="clyuser" dbType="master" desc="管理控制台关联位置DB" />
+	<relation serviceName="ClyAdmin" roleName="cly_boss"
+			  userId="clyuser" dbType="master" desc="管理控制台关联boss统计DB" />
+	<relation serviceName="ClyAdmin" roleName="cly_platform" 
+			  userId="clyuser" dbType="master" desc="管理控制关联读取平台配置DB" />
+</relations>
+</dalset>

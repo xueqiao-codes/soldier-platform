@@ -1,0 +1,65 @@
+#!/bin/bash -e
+#
+# S2I assemble script for the 'java_service_builder' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+# If the 'java_service_builder' assemble script is executed with the '-h' flag, print the usage.
+if [[ "$1" == "-h" ]]; then
+  exec /usr/libexec/s2i/usage
+fi
+
+# Restore artifacts from the previous build (if they exist).
+#
+if [ "$(ls -a /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring build artifacts..."
+  mv /tmp/artifacts/.m2 $HOME/.
+fi
+
+echo "---> Installing application source..."
+echo "---> Current dir is $( pwd ), HOME is $HOME, change to /tmp/src..."
+
+pushd /tmp/src/LuaJIT-2.0.5 > /dev/null
+echo "---> Compile LuaJIT..."
+
+make PREFIX=/usr/local/luajit
+make install PREFIX=/usr/local/luajit
+
+export LUAJIT_LIB=/usr/local/luajit/lib
+export LUAJIT_INC=/usr/local/luajit/include/luajit-2.0
+echo "/usr/local/luajit/lib" > /etc/ld.so.conf.d/usr_local_lib.conf
+ldconfig
+
+popd > /dev/null
+
+pushd /tmp/src/nginx-1.14.1 > /dev/null
+
+
+chmod a+x configure
+
+echo "---> Building nginx from source..."
+./configure --with-cc-opt='-O2' \
+	--with-http_ssl_module \
+	--with-http_v2_module \
+	--with-http_stub_status_module \
+	--error-log-path=/var/log/nginx-error.log \
+	--http-log-path=/var/log/nginx-access.log \
+	--pid-path=/var/run/nginx/nginx.pid  \
+	--lock-path=/var/run/nginx/nginx.lock \
+	--http-client-body-temp-path=/var/cache/nginx/client_temp \
+	--http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+	--http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+	--http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+	--http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+	--with-http_auth_request_module \
+	--add-module=../ngx_devel_kit-0.3.0/  \
+	--add-module=../lua-nginx-module-0.10.13/
+make
+make install
+
+popd > /dev/null
+
+echo "---> Assemble finished!!!"

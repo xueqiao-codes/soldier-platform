@@ -1,0 +1,7 @@
+@CHARSET "UTF-8";
+
+.col1,.col2,.col3{
+	border:1px solid;
+	text-align:center;
+	width:100px;
+}

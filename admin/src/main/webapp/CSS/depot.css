@@ -1,0 +1,160 @@
+@CHARSET "UTF-8";
+
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td 
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+html, body{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	width: 100%;
+	height: 100%;
+}
+
+ul {
+	list-style-type: none;
+}
+
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0px;
+}
+
+input.text { width:95%; padding: 0.4em; }
+input.button, button.button {padding: 0.4em;}
+fieldset { padding:0; border:0px; margin-top:25px; }
+.ui-dialog .ui-state-error { padding: .3em; }
+.validateTips { border: 1px solid transparent; padding: 0.3em; }
+
+.module_manage {
+	margin:1% 0 0 1%;
+	width: 98%;
+	height: 98%;
+}
+
+.module_manage table {
+	width:100%;
+	font-size: 12px;
+}
+
+.module_manage div.list_header {
+	height:30px;
+}
+
+.module_manage div.list_header div.title {
+	width:50%;
+	float:left;
+}
+
+.module_manage div.list_header div.title span
+{
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.module_manage div.list_header div.action {
+	width:50%;
+	float:right;
+}
+
+.module_manage div.list_header div.action a {
+	float:right;
+}
+
+.module_manage div.list_containter {
+	overflow-y:auto;
+	height:560px;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	border-radius: 2px;
+	margin-top: 4px;
+}
+
+.module_manage div.list_containter table tr{
+	margin:0px;
+}
+
+.module_manage div.list_containter table td, .module_manage div.list_containter table th{
+	height:30px;
+	text-align: center;
+	border: 0px;
+}
+
+.module_manage div.list_containter table tr.odd td{
+	background-color: #eee;
+}
+
+.module_manage div.list_containter table tr.even td{
+	background-color: #ccc;
+}
+
+.module_manage div.list_containter td.action span {
+	margin-left: 4px;
+}
+
+.module_manage div.list_containter td.name {
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.page_nav {
+	background-color: transparent;
+	padding: 16px 4px;
+	text-align: center;
+}
+
+.page_nav span, .list_condition_nav span {
+	margin-right: 10px;
+}
+
+.page_nav span a {
+	color: #fff;
+	padding: 4px;
+	background-color: #777;
+	text-decoration: none;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	border-radius: 2px;
+}
+
+.page_nav .button {
+	padding: 3px;
+}
+
+.page_nav .text {
+	width:30px;
+	padding: 2px;
+}
+
+.list_condition_nav {
+	background-color: #ededed;
+	padding: 4px;
+	text-align: center;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	border-radius: 2px;
+}
+
+.list_condition_nav .list_info {
+	font-weight: bold;
+	margin-right: 40px; 
+}
+
+.list_condition_nav .wdith100 {
+	width: 100px;
+}
+
+.list_condition_nav .wdith200 {
+	width: 200px;
+}
+
+#batch_stock_list .list_condition_nav {
+	text-align: left;
+}

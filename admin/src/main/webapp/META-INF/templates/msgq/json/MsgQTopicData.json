@@ -1,0 +1,18 @@
+{
+	"page": ${pageIndex + 1},
+	"total": ${itemsResult.totalNum},
+	<#assign rownum=0 />
+	"rows":[
+		<#list itemsResult.topicList as item >
+		<#if rownum &gt; 0>,</#if>
+		{
+			"topicName":"${item.topicName}",
+			"topicCluster":"${item.topicCluster}",
+			"remark":"${item.topicDesc?js_string}",
+			"createTime":"${fromUnixTimestamp(item.createTimestamp)}",
+			"lastmodifyTime":"${fromUnixTimestamp(item.lastmodifyTimestamp)}"
+		}
+		<#assign rownum=rownum+1 />
+		</#list>
+	]
+}

@@ -1,0 +1,128 @@
+kind: Template
+apiVersion: v1
+metadata: 
+  name: mitty-app-template
+  annotations:
+    openshift.io/display-name: "Mitty"
+    description: "Webapp Using Mitty"
+    tags: "java"
+    iconClass: icon-openjdk
+parameters: 
+  - name: "NAME"
+    displayName: "Name"
+    description: "The template name for generate api objects, must be accepted by k8s"
+    required: true
+    
+  - name: "HTTP_PORT"
+    displayName: "Http Port"
+    description: "The http port for mitty"
+    required: true
+    value: "8080"
+    
+  - name: "OPENSHIFT_PROJECT_NAME"
+    displayName: "The Openshift Project Name"
+    description: "The Openshift Project Name for your deployment"
+    required: true
+    
+  - name: "IMAGE_VERSION"
+    displayName: "ImageVersion"
+    description: "The Docker Image Version, like v1..."
+    required: true
+    value: "v1"
+    
+  - name: "REPLICAS_NUM"
+    displayName: "Replicas"
+    description: "Replicas number for deploy"
+    required: true
+    value: "2"
+    
+  - name: "MEMORY_REQUEST"
+    displayName: "Minimum memory"
+    description: "Minimum memory for your service"
+    required: true
+    value: "100Mi"
+    
+  - name: "MEMORY_LIMIT"
+    displayName: "Maximum memory"
+    description: "Maximum memory for your service"
+    required: true
+    value: "200Mi"
+    
+  - name: "CPU_REQUEST"
+    displayName: "Minimum cpu"
+    description: "Minimum cpu for your service"
+    required: true
+    value: "0.02"
+    
+  - name: "CPU_LIMIT"
+    displayName: "Maximum cpu"
+    description: "Maximum cpu for your service"
+    required: true
+    value: "0.5"
+    
+message: "The following service(s) have been created in your project: ${NAME}.\n\nFor more information about using this template"
+labels: 
+  template: "mitty-app-template"
+  app: "${NAME}"
+objects:
+- kind: Service
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations:
+      description: "Exposes and load balances the application pods"
+  spec: 
+    ports: 
+    - name: "${NAME}-port"
+      port: 80
+      targetPort: ${{HTTP_PORT}}
+    selector: 
+      name: "${NAME}"
+
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+      description: "Defines how to deploy the application server"
+      template.alpha.openshift.io/wait-for-ready: "true"
+  spec: 
+    strategy: 
+      type: Rolling
+    triggers: 
+    - type: ConfigChange
+    replicas: ${REPLICAS_NUM}
+    selector: 
+      name: "${NAME}"
+    template: 
+      metadata:
+        name: "${NAME}"
+        labels:
+          name: "${NAME}"
+      spec:
+        hostIPC: true
+        containers: 
+        - name: ${NAME}
+          image: "docker-registry.default.svc:5000/${OPENSHIFT_PROJECT_NAME}/${NAME}:${IMAGE_VERSION}"
+          ports:
+          - containerPort: ${HTTP_PORT}
+          env:
+          - name: APPLOG_STDOUT_MODE
+            value: 'true'
+          readinessProbe:
+            timeoutSeconds: 3
+            initialDelaySeconds: 3
+            tcpSocket: 
+              port: ${{HTTP_PORT}}
+          livenessProbe: 
+            timeoutSeconds: 3
+            initialDelaySeconds: 30
+            tcpSocket: 
+              port: ${{HTTP_PORT}}
+          resources:
+            limits:
+              cpu: "${CPU_LIMIT}"
+              memory: "${MEMORY_LIMIT}"
+            requests:
+              cpu: "${CPU_REQUEST}"
+              memory: "${MEMORY_REQUEST}"

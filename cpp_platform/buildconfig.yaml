@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: BuildConfig
+metadata:
+  annotations:
+    template.alpha.openshift.io/wait-for-ready: 'true'
+  name: cpp-platform
+  namespace: soldier-platform
+spec:
+  nodeSelector: 
+    node-role.soldier.platform/builder: 'true'
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'cpp-platform:1.0.0'
+  postCommit: {}
+  resources: 
+    limits:
+      cpu: 1
+  runPolicy: Serial
+  source:
+    git:
+      ref: master
+      uri: 'ssh://git@git.soldier-tools.svc:29418/soldier-platform/cpp_platform.git'
+    sourceSecret:
+      name: xueqiao-git
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: 'soldier-baseos:latest'
+        namespace: soldier-platform
+    type: Source
+  triggers:
+    - type: ImageChange
+    - type: ConfigChange

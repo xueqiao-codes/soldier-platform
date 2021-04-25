@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="${static_url}/CSS/common.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/flexigrid/css/flexigrid.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" type="text/css" />
+<script type="text/javascript" src="${static_url}/JS/jquery-1.7.2.min.js" ></script>
+<script type="text/javascript" src="${static_url}/JS/flexigrid/js/flexigrid.js" ></script>
+<script type="text/javascript" src="${static_url}/JS/util.js"></script>
+<script type="text/javascript" src="${static_url}/JS/jquery.noty.min.js"></script>
+<title>消息队列消费者管理</title>
+</head>
+<body>
+<div>
+<table>
+<tr>
+<th>消费者Key:<input type="text" id="queryConsumerKey" name="consumerKey" style="width:100px"/></th>
+<th>关联主题:
+<select id="queryTopicName" name="topicName" >
+	<option value=""></option>
+	<#list topicItems as topicItem>
+	<option value="${topicItem.topicName}">${topicItem.topicName}</option>
+	</#list>
+</select>
+</th>
+<th>消费模式:
+<select id="queryConsumerMode" name="consumerMode" >
+	<option value=""></option>
+	<#list supportConsumerModes as supportConsumerMode>
+		<option value="${supportConsumerMode}">${supportConsumerMode}</option>
+	</#list>
+</select>
+</th>
+<th>同步状态:
+<select id="queryHasSync" name="hasSync">
+	<option value=""></option>
+	<option value="0">未同步</option>
+	<option value="1">已同步</option>
+</select>
+</th>
+<th>属性查询:<input type="text" id="queryConsumerPropertyKey" name="consumerPropertyKey" style="width:80px"/>=
+<input type="text" id="queryConsumerPropertyValue" name="consumerPropertyValue" style="width:80px" />
+<th>备注:<input type="text" id="queryRemark" name="remark" style="width:80px"/></th>
+<th><input class="operation_menu" type="button" value="查询" onclick="queryProducer()"/></th>
+</tr>
+</table>
+<table>
+<tr>
+
+</th>
+</tr>
+</table>
+</div>
+<table id="msgq_consumer_table" style="display:none"></table>
+<div id="dialog_div" >
+<form autocomplete="off">
+<table>
+<tr>
+    <th>消费者Key:</th>
+    <th><input id="dialog_input_consumerKey" type="text" name="consumerKey"></th>
+    <th><b style="color:red">*</b></th>
+    <th></th>
+</tr>
+<tr>
+    <th>关联主题:</th>
+    <th align="left">
+    	<select id="dialog_input_topicName" name="topicName">
+		<option value=""></option>
+		<#list topicItems as topicItem>
+		<option value="${topicItem.topicName}">${topicItem.topicName}</option>
+		</#list>
+		</select>	
+	</th>
+    <th><b style="color:red">*</b></th>
+    <th></th>
+</tr>
+<tr>
+	<th>消费模式</th>
+	<th align="left">
+		<select id="dialog_input_consumerMode" name="consumerMode" >
+		<option value=""></option>
+		<#list supportConsumerModes as supportConsumerMode>
+			<option value="${supportConsumerMode}">${supportConsumerMode}</option>
+		</#list>
+		</select>
+	</th>
+</tr>
+<tr>
+    <th>备注:</th>
+    <th><input id="dialog_input_remark" type="text" name="remark"></th>
+    <th></th>
+    <th></th>
+</tr>
+</table>
+</form>
+</div>
+<script type="text/javascript" src="${base_url}/js/msgq_consumer.js" ></script>
+<script type="text/javascript">
+
+$("#msgq_consumer_table").flexigrid({
+        title: "集群管理",
+        url:"${base_url}/MsgQConsumerManage/consumerListData",
+        dataType: "json" ,
+        height: 500,
+        colModel:[
+            {
+                display:'消费者Key',
+                name:'consumerKey',
+                width:150,
+                sortable:false,
+                align:'center',
+                iskey:true
+            },
+            {
+                display:'关联主题',
+                name:'topicName',
+                width:150,
+                sortable:false,
+                align:'center'
+            },
+            {
+            	display:'消费模式',
+            	name:'consumerMode',
+            	width:80,
+            	sortable:false,
+            	align:'center'
+            },
+            {
+            	display:'同步状态',
+            	name:'hasSync',
+            	width:80,
+            	sortable:false,
+            	align:'center'
+            },
+            {
+                display:'备注',
+                name:'remark',
+                width:150,
+                sortable:false,
+                align:'center'
+            },
+            
+            {
+                display:'创建时间',
+                name:'createTime',
+                width:200,
+                sortable:false,
+                align:'center'
+            },
+            {
+                display:'最近修改时间',
+                name:'lastmodifyTime',
+                width:200,
+                sortable:false,
+                align:'center'
+            }
+        ],
+        buttons:[
+            {
+                name:'增加',
+                bclass:'add',
+                onpress:addConsumer
+            },
+            {
+                name:'修改',
+                bclass:'modify',
+                onpress:modifyConsumer
+            },
+            {
+            	name : '删除',
+            	bclass: 'delete',
+            	onpress: deleteConsumer
+            }
+        ], 
+        showToggleBtn:false,
+        useRp:false,
+        rp:20,
+        usepager:true,
+        procmsg: '正在请求服务端数据...',
+        nomsg: '没有数据',
+        errormsg: '出错啦~~',
+        pagestat:'当前显示记录 {from} 到 {to} 条，总 {total} 条'
+    });
+</script>
+</body>
+<script type="text/javascript" src="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.js" ></script>
+<script>
+$(function(){
+    $('#dialog_div').dialog({
+        hide:'',    //点击关闭是隐藏,如果不加这项,关闭弹窗后再点就会出错.
+        autoOpen:false,
+        width: 370,
+        height: 230,
+        modal:true, //蒙层
+        title:'消费者管理',
+        overlay: {
+            opacity: 0.5,
+            background: "black"
+        },
+        buttons:{
+            '提交':function(){
+                doUpdate();
+            },
+            '取消':function(){
+                $(this).dialog("close");
+            },
+        }
+    });
+});
+
+</script>
+</html>

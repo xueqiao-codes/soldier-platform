@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Thrift 代码生成</title>
+		<link rel="stylesheet" type="text/css" href="css/thrift-gen.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" type="text/css" href="css/jqueryFileTree.css" media="screen" />
+		<script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+		<script type="text/javascript" src="js/jquery.easing.js" ></script>
+		<script type="text/javascript" src="js/jqueryFileTree.js" ></script>
+		<script type="text/javascript" src="js/jquery.base64.js" ></script>
+    	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/thrift-gen.js"></script>
+	</head>
+	<body>
+		<div class="thrift">
+			<div class="files page-header clear">
+				<div class="file-list">
+					<h2>服务器文件列表</h2>
+					<div id="server-file-list"></div>
+				</div>
+
+				<div class="file-list">
+					<h2>已选文件列表</h2>
+					<ul class="jqueryFileTree" id="selected-file-list">
+					</ul>
+				</div>
+			</div>
+			<div>
+	            <input type="text" id="keyword" placeholder="关键字" /> <button id="search">搜索</button>
+			</div>
+			<div class="langs page-header">
+				<h2>生成代码类型</h2>
+				<ul id="lang-list">
+	            </ul>
+			</div>
+			<div class="result">
+				<button id="start-btn">生成</button>
+				<label id="generate-result">生成失败</label>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: zk-manager-deploy
+  spec:
+    selector:
+      matchLabels:
+        app: zk-manager
+    replicas: 1
+    template:
+      metadata:
+        labels:
+          app: zk-manager
+      spec:
+        containers:
+        - name: zk-manager
+          image: docker-registry.default.svc:5000/soldier-tools/zookeeper-webui
+          ports:
+          - containerPort: 8080
+          env: 
+          - name: ZK_DEFAULT_NODE
+            value: zk-client.soldier-platform.svc:2181/
+          - name: USER
+            value: admin
+          - name: PASSWORD
+            value: admin
+          resources:
+            limits:
+              cpu: 0.1
+              memory: 500Mi
+            requests:
+              cpu: 0.01
+              memory: 200Mi
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: zk-manager
+  spec:
+    selector:
+      app: zk-manager
+    type: ClusterIP
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+      name: zk-manager-port
+    
+  

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: snginx-agent
+spec:
+  selector:
+    matchLabels:
+      name: snginx-agent
+  template:
+    metadata:
+      labels:
+        name: snginx-agent
+    spec:
+      hostIPC: true
+      nodeSelector:
+        node-role.soldier.platform/nginx: 'true'
+      containers:
+      - name: snginx
+        image: 'docker-registry.default.svc:5000/soldier-platform/snginx'
+        ports:
+          - containerPort: 80
+            protocol: TCP
+            hostPort: 80
+          - containerPort: 443
+            protocol: TCP
+            hostPort: 443
+        resources: 
+          limits:
+           cpu: "2"
+           memory: 1Gi
+          requests:
+           cpu: "0.1"
+           memory: 512Mi
+        readinessProbe:
+          timeoutSeconds: 3
+          initialDelaySeconds: 3
+          tcpSocket: 
+            port: 80
+        livenessProbe: 
+          timeoutSeconds: 3
+          initialDelaySeconds: 30
+          tcpSocket: 
+            port: 80
+        volumeMounts:
+        - mountPath: /etc/nginx
+          name: snginx-config-map-mount
+          readOnly: true
+        - mountPath: /var/cache/nginx
+          name: snginx-cache
+        - mountPath: /snginx/run
+          name: snginx-run
+        - mountPath: /snginx/data
+          name: snginx-data
+        - mountPath: /certs/snginx
+          name: snginx-certs-map-mount
+      - name: snginx-agent
+        image: docker-registry.default.svc:5000/soldier-platform/snginx-agent
+        env:
+        - name: APPLOG_STDOUT_MODE
+          value: "true"
+        - name: SNGINX_DATA_DIR
+          value: "/snginx/data"
+        - name: SNGINX_LOAD_BY_HTTP
+          value: "true"
+        volumeMounts:
+        - name: snginx-data
+          mountPath: /snginx/data
+        resources:
+          limits:
+            cpu: 50m
+            memory: 120Mi
+          requests:
+            cpu: 1m
+            memory: 60Mi
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: snginx-config-map
+        name: snginx-config-map-mount
+      - emptyDir: {}
+        name: snginx-cache
+      - emptyDir: {}
+        name: snginx-data
+      - emptyDir: {}
+        name: snginx-run
+      - configMap:
+          defaultMode: 420
+          name: snginx-certs-map
+        name: snginx-certs-map-mount
+      
+      

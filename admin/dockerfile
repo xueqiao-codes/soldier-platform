@@ -1,0 +1,6 @@
+FROM docker-registry.default.svc:5000/soldier-platform/mitty
+
+ADD target/*.war /
+RUN /usr/local/soldier/mitty/mitty.sh install $( ls -al / | egrep "*.zip$" | awk '{print $NF}' )
+
+CMD /usr/local/soldier/mitty/mitty.sh start all

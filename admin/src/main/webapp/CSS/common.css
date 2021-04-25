@@ -1,0 +1,32 @@
+@CHARSET "UTF-8";
+
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, code, del, dfn, em, img, q, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td 
+{
+	margin: 0px;
+	padding: 0px;
+}
+
+html body{
+	font-family: Verdana, Geneva, sans-serif;
+	font-size: 12px;
+	padding : 2px;
+	min-width: 850px;
+}
+
+.table_header{
+	background-color:#FAEBD7;
+}
+
+
+.table_common{
+	margin-top:5px;
+	border-collapse:collapse;
+	border : 1px solid;
+}
+
+.table_full_layout{
+	width : 100%;
+	border : 0px;
+	margin : 0px;
+	padding : 0px;
+}

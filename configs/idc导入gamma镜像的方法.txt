@@ -1,0 +1,16 @@
+1. 下载windows下的oc客户端工具http://soldier-idc-oss.oss-cn-shanghai.aliyuncs.com/openshift-origin-client-tools-v3.10.0-dd10d17-windows.zip
+2. 在windows的命令行下执行
+   oc login k8s.xueqiao.cn:8443
+3. 切换到你需要操作的Openshift工程下, 例如
+   oc project soldier-platform
+4. 调用导入镜像命令行, 形势如oc import-image ${NAME}:${IMAGE_VERSION} --insecure=true --reference-policy=local --from=registry.gak8sapps.xueqiao.cn/${OPENSHIFT_PROJECTNAME}/${NAME}:${IMAGE_VERSION} 
+   例如:
+   oc import-image fast-thrift-proxy:v3 --insecure=true --reference-policy=local --from=registry.gak8sapps.xueqiao.cn/soldier-platform/fast-thrift-proxy:v3  --confirm --dry-run  //用于测试指令
+   oc import-image fast-thrift-proxy:v3 --insecure=true --reference-policy=local --from=registry.gak8sapps.xueqiao.cn/soldier-platform/fast-thrift-proxy:v3  --confirm  //执行导入
+   
+注意： IDC下不允许导入GAMMA下latest的镜像，必须使用对应的编译版本
+
+工程配置：
+oc project xueqiao-graph
+oc create secret docker-registry gamma-registry --docker-username='serviceaccount' --docker-password=eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJ4dWVxaWFvLWdyYXBoIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImRlZmF1bHQtdG9rZW4tdGxoNWQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC5uYW1lIjoiZGVmYXVsdCIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VydmljZS1hY2NvdW50LnVpZCI6IjZhODg3YjZiLTY5OWItMTFlOS1hMjI3LTAwMTYzZTA4YjE2NyIsInN1YiI6InN5c3RlbTpzZXJ2aWNlYWNjb3VudDp4dWVxaWFvLWdyYXBoOmRlZmF1bHQifQ.qO-RIab_0LKGonxHm50CRJTwFtegXwrwhmyqF44xZMUoVpsMvft0La1rdIFDXfPvGsTi0FrLoMGzYU0raOob9-pSr8oyPMnBGs8lyD96SlkuRR__92PjQShE6AOVL4ayRysW5VLZh_8FvH2m-0s8hHRMH4relO0DKEyZITKfW81j-81RaWukwU-WNNsIwA1T_1PyVgCCGLmsuqpgQ0NqUD8anSngVxDbeXQfYrtbVFAJECgLfa9ra5P5fyXbup1zHw9kMXAIgfKmnySXdHXqM25ndgQOYAvulRNnM6-SfZFJsm7FtwldWdpvhxfBoBYJnKXm5yUHvYHNIw_9Zd-OTA --docker-email=serviceaccount@example.org --docker-server=registry.gak8sapps.xueqiao.cn
+oc secrets add serviceaccount/default secrets/gamma-registry --for=pull

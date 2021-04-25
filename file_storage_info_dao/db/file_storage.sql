@@ -1,0 +1,9 @@
+CREATE TABLE tfile_storage_info (
+	Fstorage_key VARCHAR(64) NOT NULL DEFAULT "",
+	Faccess_attribute SMALLINT UNSIGNED NOT NULL DEFAULT 0,
+	Fdomain VARCHAR(256) NOT NULL DEFAULT "",
+	Fdesc VARCHAR(256) NOT NULL DEFAULT "",
+	Fcreate_timestamp INT UNSIGNED NOT NULL DEFAULT 0,
+	Flastmodify_timestamp INT UNSIGNED NOT NULL DEFAULT 0,
+	PRIMARY KEY(Fstorage_key)
+) CHARACTER SET UTF8;

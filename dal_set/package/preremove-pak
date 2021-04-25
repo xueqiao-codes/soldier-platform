@@ -1,0 +1,9 @@
+if [ $1 -eq 0 ];then
+	rm -f /usr/local/soldier/dal_set/auto_restart.sh
+	
+	/usr/local/soldier/dal_set/bin/dal_set_agent_daemon.sh stop
+	
+	sed -i '/\/usr\/local\/soldier\/dal_set\/bin$/d' /etc/profile
+	
+	rm -f /usr/local/soldier/dal_set/data/version
+fi

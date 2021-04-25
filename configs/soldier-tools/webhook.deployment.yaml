@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: "git-webhook-deploy"
+spec:
+  replicas: 1
+  selector:
+    app: "git-webhook"
+  template:
+    metadata:
+      labels:
+        app: "git-webhook"
+    spec:
+      containers:
+        - image: "docker-registry.default.svc:5000/soldier-tools/go-git-webhook"
+          name: 'go-git-webhook'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: 
+            limits:
+              cpu: 0.25
+              memory: 600Mi
+            requests:
+              cpu: 0.01
+              memory: 300Mi
+          volumeMounts:
+            - mountPath: /go-git-webhook/conf
+              name: webhook-conf
+              readOnly: true
+            - mountPath: /go-git-webhook/logs
+              name: webhook-logs
+        - image: "docker-registry.default.svc:5000/soldier-tools/ubuntu-sshd-curl:18.04"
+          name: sshd-curl
+          ports:
+            - containerPort: 22
+              protocol: TCP
+      nodeSelector:
+        network.db.permit: 'true'
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: go-git-webhook-maps
+          name: webhook-conf
+        - emptyDir: {}
+          name: webhook-logs

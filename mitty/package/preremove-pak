@@ -1,0 +1,13 @@
+if [ $1 -eq 0 ];then
+	rm -f /usr/local/soldier/mitty/auto_restart.sh
+
+	sed -i '/\/usr\/local\/soldier\/mitty$/d' /etc/profile
+	
+	TMP_REMOVE_FILE=/tmp/crontab_remove_epower_mitty
+	crontab -l -u epower > ${TMP_REMOVE_FILE}
+	sed -i '/\/usr\/local\/soldier\/mitty\/cleanup.sh/d' ${TMP_REMOVE_FILE}
+	crontab -u epower ${TMP_REMOVE_FILE}
+	rm -f ${TMP_REMOVE_FILE}
+	
+	su - epower /usr/local/soldier/mitty/mitty.sh stop all
+fi

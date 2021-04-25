@@ -1,0 +1,2 @@
+{"version" : ${version},<#assign rownum=0 />"items" : [<#list items as item ><#if rownum &gt; 0>,</#if>
+{"serviceKey": ${item.serviceKey?c}, "ipList" : "${ipList2Str(item.ipList)?js_string}"}<#assign rownum=rownum+1 /></#list>]}

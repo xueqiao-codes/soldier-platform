@@ -1,0 +1,202 @@
+package org.soldier.platform.filestorage.dao.client;
+
+import org.soldier.platform.filestorage.dao.FileStorageDao;
+import org.soldier.platform.filestorage.dao.FileStorageDaoVariable;
+import org.apache.thrift.TException;
+import org.soldier.base.NetHelper;
+import org.soldier.platform.svr_platform.client.AsyncCallRunner;
+import org.soldier.platform.svr_platform.client.IMethodCallback;
+import org.soldier.platform.svr_platform.client.SvrContainer;
+import org.soldier.platform.svr_platform.client.TRequestOption;
+import org.soldier.platform.svr_platform.client.TServiceCall;
+import org.soldier.platform.svr_platform.comm.PlatformArgs;
+import java.nio.ByteBuffer;
+import org.soldier.platform.filestorage.dao.HttpOption;
+
+public class FileStorageDaoAsyncStub { 
+  private String peerAddr;
+
+  public void setPeerAddr(final String ipAddr) { 
+    if (ipAddr == null) { 
+      peerAddr = null; 
+    }
+    if (-1l != NetHelper.AddrNet(ipAddr)) {
+      peerAddr = ipAddr; 
+    }
+  }
+
+  public String getPeerAddr() { 
+    return peerAddr;
+  }
+
+  public void send_readFile(int routeKey, int timeout, String storageKey, String path) throws TException {
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    SvrContainer.getInstance().sendRequest(
+        create_readFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), new TRequestOption());
+  }
+
+  public void send_readFile(int routeKey, int timeout, String storageKey, String path,TRequestOption requestOption) throws TException { 
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    SvrContainer.getInstance().sendRequest(
+        create_readFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), requestOption);
+  }
+
+  public long readFile(int routeKey, int timeout, String storageKey, String path, IMethodCallback<FileStorageDao.readFile_args, FileStorageDao.readFile_result> callback) throws TException{
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":"
+        + callStackElement.getLineNumber() + "]");
+    return SvrContainer.getInstance().sendRequest(
+            create_readFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), callback);
+  }
+
+  public long add_readFileCall(AsyncCallRunner runner, int routeKey, int timeout, String storageKey, String path, IMethodCallback<FileStorageDao.readFile_args, FileStorageDao.readFile_result> callback) throws TException{
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    return runner.addAsyncCall(
+            create_readFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), callback);
+  }
+
+  protected TServiceCall create_readFileServiceCall(int routeKey, int timeout, org.soldier.platform.svr_platform.comm.PlatformArgs platformArgs, String storageKey, String path){
+    TServiceCall serviceCall = new TServiceCall();
+    serviceCall.setServiceKey(FileStorageDaoVariable.serviceKey);
+    serviceCall.setRouteKey(routeKey);
+    serviceCall.setOneWay(false);
+    FileStorageDao.readFile_args request = new FileStorageDao.readFile_args();
+    request.setPlatformArgs(platformArgs);
+    request.setStorageKey(storageKey);
+    request.setPath(path);
+    serviceCall.setRequest(request);
+    serviceCall.setMethodName("readFile");
+    serviceCall.setTimeout(timeout);
+    serviceCall.setResponse(FileStorageDao.readFile_result.class);
+    return serviceCall;
+  }
+
+  public void send_writeFile(int routeKey, int timeout, String storageKey, String path, ByteBuffer content, HttpOption option) throws TException {
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    SvrContainer.getInstance().sendRequest(
+        create_writeFileServiceCall(routeKey, timeout, platformArgs, storageKey, path, content, option), new TRequestOption());
+  }
+
+  public void send_writeFile(int routeKey, int timeout, String storageKey, String path, ByteBuffer content, HttpOption option,TRequestOption requestOption) throws TException { 
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    SvrContainer.getInstance().sendRequest(
+        create_writeFileServiceCall(routeKey, timeout, platformArgs, storageKey, path, content, option), requestOption);
+  }
+
+  public long writeFile(int routeKey, int timeout, String storageKey, String path, ByteBuffer content, HttpOption option, IMethodCallback<FileStorageDao.writeFile_args, FileStorageDao.writeFile_result> callback) throws TException{
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":"
+        + callStackElement.getLineNumber() + "]");
+    return SvrContainer.getInstance().sendRequest(
+            create_writeFileServiceCall(routeKey, timeout, platformArgs, storageKey, path, content, option), callback);
+  }
+
+  public long add_writeFileCall(AsyncCallRunner runner, int routeKey, int timeout, String storageKey, String path, ByteBuffer content, HttpOption option, IMethodCallback<FileStorageDao.writeFile_args, FileStorageDao.writeFile_result> callback) throws TException{
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    return runner.addAsyncCall(
+            create_writeFileServiceCall(routeKey, timeout, platformArgs, storageKey, path, content, option), callback);
+  }
+
+  protected TServiceCall create_writeFileServiceCall(int routeKey, int timeout, org.soldier.platform.svr_platform.comm.PlatformArgs platformArgs, String storageKey, String path, ByteBuffer content, HttpOption option){
+    TServiceCall serviceCall = new TServiceCall();
+    serviceCall.setServiceKey(FileStorageDaoVariable.serviceKey);
+    serviceCall.setRouteKey(routeKey);
+    serviceCall.setOneWay(false);
+    FileStorageDao.writeFile_args request = new FileStorageDao.writeFile_args();
+    request.setPlatformArgs(platformArgs);
+    request.setStorageKey(storageKey);
+    request.setPath(path);
+    request.setContent(content);
+    request.setOption(option);
+    serviceCall.setRequest(request);
+    serviceCall.setMethodName("writeFile");
+    serviceCall.setTimeout(timeout);
+    serviceCall.setResponse(FileStorageDao.writeFile_result.class);
+    return serviceCall;
+  }
+
+  public void send_deleteFile(int routeKey, int timeout, String storageKey, String path) throws TException {
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    SvrContainer.getInstance().sendRequest(
+        create_deleteFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), new TRequestOption());
+  }
+
+  public void send_deleteFile(int routeKey, int timeout, String storageKey, String path,TRequestOption requestOption) throws TException { 
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    SvrContainer.getInstance().sendRequest(
+        create_deleteFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), requestOption);
+  }
+
+  public long deleteFile(int routeKey, int timeout, String storageKey, String path, IMethodCallback<FileStorageDao.deleteFile_args, FileStorageDao.deleteFile_result> callback) throws TException{
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":"
+        + callStackElement.getLineNumber() + "]");
+    return SvrContainer.getInstance().sendRequest(
+            create_deleteFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), callback);
+  }
+
+  public long add_deleteFileCall(AsyncCallRunner runner, int routeKey, int timeout, String storageKey, String path, IMethodCallback<FileStorageDao.deleteFile_args, FileStorageDao.deleteFile_result> callback) throws TException{
+    PlatformArgs platformArgs = new PlatformArgs();
+    StackTraceElement callStackElement = Thread.currentThread().getStackTrace()[2];
+    platformArgs.setSourceDesc(
+        callStackElement.getClassName() + "[" + callStackElement.getMethodName() + ":" 
+        + callStackElement.getLineNumber() + "]");
+    return runner.addAsyncCall(
+            create_deleteFileServiceCall(routeKey, timeout, platformArgs, storageKey, path), callback);
+  }
+
+  protected TServiceCall create_deleteFileServiceCall(int routeKey, int timeout, org.soldier.platform.svr_platform.comm.PlatformArgs platformArgs, String storageKey, String path){
+    TServiceCall serviceCall = new TServiceCall();
+    serviceCall.setServiceKey(FileStorageDaoVariable.serviceKey);
+    serviceCall.setRouteKey(routeKey);
+    serviceCall.setOneWay(false);
+    FileStorageDao.deleteFile_args request = new FileStorageDao.deleteFile_args();
+    request.setPlatformArgs(platformArgs);
+    request.setStorageKey(storageKey);
+    request.setPath(path);
+    serviceCall.setRequest(request);
+    serviceCall.setMethodName("deleteFile");
+    serviceCall.setTimeout(timeout);
+    serviceCall.setResponse(FileStorageDao.deleteFile_result.class);
+    return serviceCall;
+  }
+
+}

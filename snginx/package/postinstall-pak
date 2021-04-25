@@ -1,0 +1,38 @@
+
+chmod u+x /usr/local/soldier/snginx/*.sh
+chmod u+x /usr/local/soldier/snginx/snginx
+
+if [ ! -d /data/applog/snginx_agent ];then
+	mkdir -p /data/applog/snginx_agent
+fi
+chown -R epower /data/applog/snginx_agent
+chgrp -R epower /data/applog/snginx_agent
+
+
+count=$( cat /etc/profile | egrep "/usr/local/soldier/snginx$" | wc -l )
+if [ $count -eq 0 ];then
+	echo "" >> /etc/profile
+	echo 'export PATH=$PATH:/usr/local/soldier/snginx' >> /etc/profile
+	echo "" >> /etc/profile
+fi
+
+crontab_installed=$( crontab -l -u root | egrep "/usr/local/soldier/snginx/watchdog.sh" | wc -l )
+if [ $crontab_installed -eq 0 ];then
+        TMP_FILE=/tmp/original_crontab_root
+        crontab -u root -l > ${TMP_FILE}
+        echo "" >> ${TMP_FILE}
+        echo "*/1 * * * * /usr/local/soldier/snginx/watchdog.sh > /dev/null 2>&1 " >> ${TMP_FILE}
+        echo "" >> ${TMP_FILE}
+        crontab -u root ${TMP_FILE}
+        rm -f ${TMP_FILE}
+fi
+
+if [ ! -f /usr/local/soldier/snginx/etc/web_servers.conf ];then
+	echo "include /usr/local/soldier/snginx/data/*.conf;" > /usr/local/soldier/snginx/etc/web_servers.conf
+fi
+
+cp -f /usr/local/soldier/snginx/etc/web_servers.conf  /data/snginx/etc/web_servers_test.conf
+chown -R epower:epower /data/snginx/etc/web_servers_test.conf
+
+/usr/local/soldier/snginx/snginx restart
+/usr/local/soldier/snginx/snginx_agent.sh restart

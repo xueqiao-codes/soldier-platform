@@ -1,0 +1,509 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="${static_url}/CSS/common.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/flexigrid/css/flexigrid.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/bootstrap3/css/bootstrap.min.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/select2/select2.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/CSS/select2-bootstrap.css" type="text/css" />
+<script type="text/javascript" src="${static_url}/JS/jquery-2.1.0.min.js" ></script>
+<script type="text/javascript" src="${static_url}/JS/jquery-migrate-1.4.1.min.js"></script>
+<script type="text/javascript" src="${static_url}/JS/flexigrid/js/flexigrid.js" ></script>
+<script type="text/javascript" src="${static_url}/JS/jquery.noty.min.js"></script>
+<script type="text/javascript" src="${static_url}/JS/bootstrap3/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="${static_url}/JS/select2/select2.min.js"></script>
+<script type="text/javascript" src="${base_url}/js/select2_portal.js"></script>
+<title>Web项目管理</title>
+</head>
+<body>
+<div>
+<table>
+<tr>
+<form name="queryWebConfigForm">
+<th>项目名:<input type="text" name="webProjectName"/></th>
+<th>后端地址:<input type="text" name="backend" /></th>
+<th>部署类型:
+<select name="deployType">
+<option value=""></option>
+<#list deployTypes as deployType>
+<option value="${deployType}">${deployType}</option>
+</#list>
+</select>
+</th>
+<th>端口:<input type="text" name="port" /></th>
+<th>备注:<input type="text" name="remark" /></th>
+</form>
+<th><input type="button" value="查询" onclick="javascript:queryWebConfig()" /></th>
+</tr>
+</table>
+</div>
+<div>
+<table id="web_manage_table" style="display:none"></table>
+<div id="dialog_div" >
+<form name="webConfigOperationForm">
+<table style="border-collapse:separate; border-spacing:0px 5px;">
+<tr>
+    <th width="15%">项目名称:</th>
+    <th width="50%"><input type="text" name="webProjectName" class="form-control"></th>
+    <th width="5%"><b style="color:red">*</b></th>
+    <th width="15%"></th>
+</tr>
+<tr>
+	<th>部署类型:</th>
+	<th align="left">
+		<select name="deployType" class="form-control">
+			<option value=""></option>
+			<#list deployTypes as deployType>
+			<option value="${deployType}">${deployType}</option>
+			</#list>
+		</select>
+	</th>
+    <th><b style="color:red">*</b></th>
+	<th></th>
+</tr>
+<tr>
+    <th>后端地址列表:</th>
+    <th><input class="form-control" type="text" name="backendList" class="form-control" /></th>
+    <th><b style="color:red">*</b></th>
+    <th>(逗号分割)</th>
+</tr>
+<tr>
+	<th>端口:</th>
+	<th><input type="text" name="port" class="form-control"/></th>
+	<th><b style="color:red">*</b></th>
+	<th></th>
+</tr>
+<tr>
+	<th>域名列表:</th>
+	<th><input type="text" name="domain" class="form-control"/></th>
+	<th></th>
+	<th>(逗号分割)</th>
+</tr>
+<tr>
+	<th>首页路径:</th>
+	<th><input type="text" name="indexPath" class="form-control"/></th>
+	<th></th>
+	<th>值必须以/开头</th>
+</tr>
+<tr>
+    <th>https证书:</th>
+    <th>
+        <select name="httpsCertName" class="form-control">
+        <option value="none"></option>
+        <#list avaiableHttpsCerts as httpsCertName>
+        <option value="${httpsCertName}">${httpsCertName}</option>
+        </#list>
+        </select>
+    </th>
+    <th></th>
+    <th></th>
+</tr>
+<tr>
+    <th>禁用http:</th>
+    <th>
+        <input type="radio" name="disableHttp" value="true">是</input>
+        <input type="radio" name="disableHttp" value="false" checked>否</input>
+    </th>
+    <th></th>
+    <th></th>
+</tr>
+<tr>
+    <th>备注:</th>
+    <th><input type="text" name="remark" class="form-control"></th>
+    <th><b style="color:red">*</b></th>
+    <th>不少于6个字</th>
+ </tr>
+</table>
+</form>
+</div>
+</div>
+</body>
+<script type="text/javascript" src="${static_url}/JS/util.js"></script>
+<script type="text/javascript" src="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.js" ></script>
+<script type="text/javascript" >
+<#import "../comm/flexgrid_function.js" as c>
+<@c.flexgrid js_name="WebManageTable" table_name="web_manage_table" />
+
+function queryWebConfig() {
+	WebManageTable.reload($(queryWebConfigForm).serializeArray());
+}
+
+function openDialog() {
+	$('#dialog_div').dialog('open');
+}
+
+function closeDialog() {
+	$('#dialog_div').dialog('close');
+}
+
+function getWebConfigInput(name) {
+	return $('form[name=webConfigOperationForm] input[name='+ name + ']');
+}
+
+function getWebConfigSelect(name) {
+	return $('form[name=webConfigOperationForm] select[name='+ name + ']');
+}
+
+function showMsg(msg) {
+	noty({text : msg, timeout : 1500});
+}
+
+function syncNginxConfig() {
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 20000,
+		data: {},
+		url : "${base_url}/WebManage/syncNginxConfig",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				showMsg("同步成功");
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500 || request.status == 404) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+function addWebConfig() {
+	$(webConfigOperationForm)[0].reset();
+	getWebConfigInput('webProjectName').removeAttr('readonly');
+
+	openDialog();
+}
+
+function deleteWebConfig() {
+	selected_count = WebManageTable.getSelectedRowCount();
+	if (selected_count > 1) {
+		showMsg('抱歉，最多只能删除一条记录');
+		return ;
+	}
+	if (selected_count < 1) {
+		showMsg('请选择要删除的行');
+		return ;
+	}
+	
+	var rowData = WebManageTable.getSelectedRowData();
+	if (confirm('确认删除项目 ' + rowData[0] + ' 的配置?')) {
+		$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data: {
+			webProjectName : rowData[0]
+		},
+		url : "${base_url}/WebManage/deleteWebConfig",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				WebManageTable.reload();
+				closeDialog();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+	}
+}
+
+function updateWebConfig() {
+	selected_count = WebManageTable.getSelectedRowCount();
+	if (selected_count > 1) {
+		showMsg('抱歉，目前只能同时修改一行');
+		return ;
+	}
+	if (selected_count < 1) {
+		showMsg('请选择修改的行');
+		return ;
+	}
+	
+	var rowData = WebManageTable.getSelectedRowData();
+	getWebConfigInput('webProjectName').val(rowData[0]).attr('readonly', 'readonly');
+	getWebConfigSelect('deployType').val(rowData[1]);
+	getWebConfigInput('backendList').val(rowData[2]);
+	getWebConfigInput('port').val(rowData[3]);
+	getWebConfigInput('domain').val(rowData[4].trim());
+	getWebConfigInput('indexPath').val(rowData[5].trim());
+	getWebConfigSelect('httpsCertName').val(rowData[6].trim());
+	$("input:radio[value='" + rowData[7].trim() + "']").attr('checked','true');
+	getWebConfigInput('remark').val(rowData[8]);
+	
+	openDialog();
+}
+
+function doWebConfigOperation() {
+	if (getWebConfigInput('webProjectName').attr('readonly')) {
+		doUpdateWebConfig();
+	} else {
+		doAddWebConfig();
+	}
+}
+
+function checkWebConfigInput() {
+	var webProjectName = getWebConfigInput('webProjectName').val();
+	if (webProjectName == ''){
+		showMsg('请填写项目名');
+		return false;
+	}
+	var deployType = getWebConfigSelect('deployType').val();
+	if (deployType == '') {
+		showMsg('请选择部署类型');
+		return false;
+	}
+	var backendList = getWebConfigInput('backendList').val();
+	if (backendList == '') {
+		showMsg('请输入后端列表');
+		return false;
+	}
+	var port = getWebConfigInput('port').val();
+	if (isNaN(parseInt(port, 10))){
+		showMsg('端口必须输入，且为数字');
+		return  false;
+	}
+	var indexPath = getWebConfigInput('indexPath').val();
+	if (indexPath != '' && !indexPath.startWith("/")) {
+		showMsg('首页路径必须以/开头');
+		return false;
+	}
+	return true;
+}
+
+function doAddWebConfig() {
+	if (!checkWebConfigInput()) {
+		return ;
+	}
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data: $(webConfigOperationForm).serialize(),
+		url : "${base_url}/WebManage/addWebConfig",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				var params = [{"name":"webProjectName", "value": getWebConfigInput('webProjectName').val()}]; 
+				WebManageTable.reload(params);
+				closeDialog();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+function doUpdateWebConfig() {
+	if (!checkWebConfigInput()) {
+		return ;
+	}
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data: $(webConfigOperationForm).serialize(),
+		url : "${base_url}/WebManage/updateWebConfig",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				var params = [{"name":"webProjectName", "value": getWebConfigInput('webProjectName').val()}]; 
+				WebManageTable.reload(params);
+				closeDialog();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+$(function(){
+	$("#web_manage_table").flexigrid({
+		title: "路由配置管理",
+		url:"${base_url}/WebManage/webConfigData",
+		dataType: "json" ,
+		height: 500,
+		colModel:[
+			{
+				display:'项目名称',
+				name:'webProjectName',
+				width:120,
+				sortable:false,
+				align:'center',
+				iskey:true
+			},
+			{
+				display:'部署类型',
+				name: 'deployType',
+				width: 60,
+				sortable: false,
+				align:'center',
+			},
+			{
+				display:'后端列表',
+				name:'backendList',
+				width:200,
+				sortable:false,
+				align:'center'
+			},
+			{
+				display : '端口',
+				name : 'port',
+				width : 35,
+				sortable : false,
+				align : 'center',
+			},
+			{
+				display : '域名列表',
+				name : 'domain',
+				width : 260,
+				sortable : false,
+				align : 'center'
+			},
+			{
+				display : '首页路径',
+				name : 'indexPath',
+				width : 150,
+				sortable : false,
+				align : 'center'
+			},
+			{
+				display : 'HTTPS证书',
+				name: 'httpsCertName',
+				width: 120,
+				sortable : false,
+				align: 'center'
+			},
+			{
+				display : '禁用HTTP',
+				name: 'disableHttp',
+				width: 70,
+				sortable: false,
+				align: 'center'
+			},
+			{
+				display:'备注',
+				name:'remark',
+				width:150,
+				sortable:false,
+				align:'center'
+			},
+			{
+				display:'创建时间',
+				name:'createTime',
+				width:150,
+				sortable:false,
+				align:'center'
+			},
+			{
+				display:'最近修改时间',
+				name:'lastmodifyTime',
+				width:150,
+				sortable:false,
+				align:'center'
+			}
+		],
+		buttons:[
+			{
+				name:'增加',
+				bclass:'add',
+				onpress: addWebConfig
+			},
+			{
+				name:'修改',
+				bclass:'modify',
+				onpress: updateWebConfig
+			},
+			{
+				name:'删除',
+				bclass:'delete',
+				onpress: deleteWebConfig
+			},
+			{  
+           		separator: true  
+        	}, 
+        	{
+        		name:'选项编辑',
+        		bclass:'modify',
+        		onpress : function() {
+        			selected_count = WebManageTable.getSelectedRowCount();
+					if (selected_count > 1) {
+						showMsg('抱歉，只能选中一行');
+						return ;
+					}
+					if (selected_count < 1) {
+						showMsg('请选择编辑的行');
+						return ;
+					}
+	
+					var rowData = WebManageTable.getSelectedRowData();
+					window.location.href="${base_url}/WebManage/showWebOptions?project=" + encodeURI(rowData[0]);
+				}
+        	}
+		], 
+		showToggleBtn:false,
+		useRp:false,
+		rp:15,
+		usepager:true,
+		procmsg: '正在请求服务端数据...',
+		nomsg: '没有数据',
+		errormsg: '出错啦~~',
+		pagestat:'当前显示记录 {from} 到 {to} 条，总 {total} 条',
+		multisel : false,
+	});
+
+    $('#dialog_div').dialog({
+        hide:'',    
+        autoOpen:false,
+        width: 620,
+        height: 500,
+        modal:true, //蒙层
+        title:'Web项目管理',
+        overlay: {
+            opacity: 0.5,
+            background: "black"
+        },
+        buttons:{
+            '提交':function(){
+                doWebConfigOperation();
+            },
+            '取消':function(){
+                $(this).dialog("close");
+            },
+        }
+    });
+    
+});
+
+</script>
+</html>

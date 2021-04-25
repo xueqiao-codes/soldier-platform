@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBtrC "-//W3C//DTD HTML 4.01 transitional//EN" "http://www.w3.org/tr/html4/loose.dtd">
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+ 
+<link rel="stylesheet" href="${static_url}/CSS/depot.css" type="text/css"/>
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" />
+<title>子菜单管理</title>
+
+</head>
+<body id="channel" class="module_manage">
+	<div class="list_header">
+		<div class="title">
+			<span>${systemMenu.systemMenuName}的子菜单</span>
+		</div>
+		<div class="action">
+			<a href="javascript:addSubMenu()">+添加菜单</a>
+		</div>
+	</div>
+	<div class="list_containter">
+		<table id="channel-table">
+			<tr>
+				<th>名称</th>
+				<th>URL</th>
+				<th>排序值</th>
+				<th>创建时间</th>
+				<th>修改时间</th>
+				<th>操作</th>
+			</tr>
+			<#list subMenus as subMenu>
+			<#if subMenu_index % 2 == 0>
+				<tr class="odd" id="submenu_${subMenu.menuId?c}">
+			<#else>
+				<tr class="even" id="submenu_${subMenu.menuId?c}">
+			</#if>
+					<td>${subMenu.menuName!}</td>
+					<td>${subMenu.menuSrc!}</td>
+					<td>${subMenu.orderWeight!?c}</td>
+					<td>${fromUnixTimestamp(subMenu.createTimestamp)}</td>
+					<td>${fromUnixTimestamp(subMenu.lastmodifyTimestamp)}</td>
+					<td>
+						<a href="javascript:updateSubMenu(${subMenu.menuId?c})"><span>修改</span></a>
+						&nbsp;&nbsp;
+						<a href="javascript:deleteSubMenu(${subMenu.menuId?c})"><span>删除</span></a>
+					</td>
+				</tr>
+			</#list>
+		</table>
+	</div>
+	
+	<!-- dialog -->
+	<div id="dialog-form" title="添加功能">
+		<p class="validateTips">必须填写名称和URL</p>
+
+		<form id="saveSubMenuForm">
+			<input type="hidden" name="menuId" id="menu_id" value="" />
+			<fieldset>
+				<label>名称</label>
+				<input type="text" name="name" id="menu_name" class="text ui-widget-content ui-corner-all" />
+				<br/><br/>
+				<label>URL</label>
+				<input type="text" name="url" id="menu_url" class="text ui-widget-content ui-corner-all" />
+				<br/><br/>
+				<label>排序值</label>
+				<input type="text" name="weight" id="menu_weight" class="text ui-widget-content ui-corner-all" />
+			</fieldset>
+		</form>
+	</div>
+	
+</body>
+<script src="${static_url}/JS/jquery-1.7.2.min.js"></script>
+<script src="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.js"></script>
+<script type='text/javascript' src='${static_url}/JS/jquery.noty.min.js'></script>
+<script>
+var systemMenuId=${systemMenu.systemMenuId?c};
+
+function openDialog() {
+	$("#dialog-form").dialog("open");
+}
+
+function closeDialog() {
+	$("#dialog-form").dialog("close");
+}
+
+function showMsg(msg) {
+	noty({text : msg, timeout : 1500});
+}
+
+function addSubMenu() {
+	$('#saveSubMenuForm')[0].reset();
+	$('#menu_id').val('');
+	$("#dialog-form").dialog('option', 'title', '增加子菜单');
+	openDialog();
+}
+
+function getRowValue(row, index) {
+	return row.children('td').eq(index).html();
+}
+
+function doAddSubMenu() {
+	var menuName = $('#menu_name').val();
+	var menuSrc = $('#menu_url').val();
+	var menuWeight = $('#menu_weight').val();
+	
+	if (menuName == "" || menuSrc=="" ){
+		showMsg("请填写完整的信息");
+		return ;
+	}
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data:{
+			menuName : menuName,
+			menuSrc : menuSrc,
+			menuWeight : menuWeight,
+			systemMenuId : systemMenuId
+		},
+		url : "${base_url}/OaMenu/addSubMenu",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				location.reload();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+function updateSubMenu(menuId) {
+	var row = $('#submenu_' + menuId);
+	$('#menu_id').val(menuId);
+	$('#menu_name').val(getRowValue(row, 0));
+	$('#menu_url').val(getRowValue(row, 1));
+	$('#menu_weight').val(getRowValue(row, 2));
+	$("#dialog-form").dialog('option', 'title', '更新子菜单');
+	openDialog();
+}
+
+function doUpdateSubMenu() {
+	var menuId = $('#menu_id').val();
+	var menuName = $('#menu_name').val();
+	var menuSrc = $('#menu_url').val();
+	var menuWeight = $('#menu_weight').val();
+	if (menuName == "" || menuSrc=="" ){
+		showMsg("请填写完整的信息");
+		return ;
+	}
+	
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data:{
+			menuName : menuName,
+			menuSrc : menuSrc,
+			menuId : menuId,
+			menuWeight : menuWeight
+		},
+		url : "${base_url}/OaMenu/updateSubMenu",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				location.reload();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+
+function deleteSubMenu(menuId) {
+	if(confirm("确认删除菜单 " + getRowValue($('#submenu_'+menuId), 0))) {
+		$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 10000,
+		data:{
+			menuId : menuId,
+		},
+		url : "${base_url}/OaMenu/deleteSubMenu",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				location.reload();
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+	}
+}
+
+$(function() {
+		$("#dialog-form").dialog({
+			autoOpen : false,
+			height : 380,
+			width : 350,
+			modal : true,
+			buttons : {
+				'提交':function(){
+					if ($('#menu_id').val() == '') {
+                		doAddSubMenu();
+                	} else {
+                		doUpdateSubMenu();
+                	}
+            	},
+            	'取消':function(){
+                	$(this).dialog("close");
+            	},
+			}
+		});
+		
+});
+	
+</script>
+</html>

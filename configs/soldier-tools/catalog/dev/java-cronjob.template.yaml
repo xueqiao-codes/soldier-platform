@@ -1,0 +1,149 @@
+kind: Template
+apiVersion: v1
+metadata: 
+  name: java-cronjob-template
+  annotations:
+    openshift.io/display-name: "Java Cronjob"
+    description: "Java cronjob template! Can not access out network!"
+    tags: "Java"
+    iconClass: icon-openjdk
+parameters: 
+  - name: "NAME"
+    displayName: "Name"
+    description: "The template name for generate api objects, must be accepted by k8s"
+    required: true
+  
+  - name: "CRONTAB_CONFIG"
+    displayName: "Crontab Config"
+    description: "The crontab config for schedule"
+    required: true
+    value: "0 3 * * *"
+    
+  - name: "SOURCE_GROUP_NAME"
+    displayName: "Git Group Name"
+    description: "Please input the git group name"
+    required: true
+  
+  - name: "SOURCE_REPOSITORY_NAME"
+    displayName: "Git Repository Name"
+    description: "Name of the repository with your application source code."
+    required: true
+  
+  - name: "SOURCE_REPOSITORY_REF"
+    displayName: "Git Reference"
+    description: "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
+    required: true
+    value: "dev"
+    
+  - name: "CONTEXT_DIR"
+    displayName: "Context Directory"
+    description: "Set this to the relative path to your project if it is not in the root of your repository."
+    value: "java"
+    
+  - name: "MEMORY_REQUEST"
+    displayName: "Minimum memory"
+    description: "Minimum memory for your service"
+    required: true
+    value: "50Mi"
+    
+  - name: "MEMORY_LIMIT"
+    displayName: "Maximum memory"
+    description: "Maximum memory for your job"
+    required: true
+    value: "200Mi"
+    
+  - name: "CPU_REQUEST"
+    displayName: "Minimum cpu"
+    description: "Minimum cpu for your job"
+    required: true
+    value: "0.01"
+    
+  - name: "CPU_LIMIT"
+    displayName: "Maximum cpu"
+    description: "Maximum cpu for your job"
+    required: true
+    value: "0.1"
+
+  - name: "GENERIC_WEBHOOK_SECRET"
+    displayName: "Generic Webhook Secret"
+    description: "A secret string used to configure the Generic webhook."
+    generate: "expression"
+    from: "[a-zA-Z0-9]{40}"
+    
+message: "The following cronjob(s) have been created in your project: ${NAME}.\n\nFor more information about using this template"
+labels: 
+  template: "java-cronjob-template"
+  app: "${NAME}"
+objects:  
+- kind: ImageStream
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+     description: "Keeps track of changes in the application image"
+
+- kind: BuildConfig
+  apiVersion: v1
+  metadata: 
+    name: "${NAME}"
+    annotations: 
+      description: "Defines how to build ${NAME}"
+      template.alpha.openshift.io/wait-for-ready: "true"
+  spec:
+    nodeSelector:
+      node-role.soldier.platform/builder: 'true'
+    source: 
+      type: "Git"
+      git: 
+         uri: "ssh://git@git.soldier-tools.svc:29418/${SOURCE_GROUP_NAME}/${SOURCE_REPOSITORY_NAME}.git"
+         ref: "${SOURCE_REPOSITORY_REF}"
+      sourceSecret:
+         name: xueqiao-git
+      contextDir: "${CONTEXT_DIR}"
+    strategy: 
+      type: Source
+      sourceStrategy:
+        incremental: true
+        from: 
+          kind: ImageStreamTag
+          namespace: soldier-tools
+          name: java-jobbuilder:latest
+    output:
+      to:
+        kind: ImageStreamTag
+        name: "${NAME}:latest"
+    triggers: 
+    - type: ImageChange
+    - type: ConfigChange
+    - type: Generic
+      generic: 
+        secret: "${GENERIC_WEBHOOK_SECRET}"
+    
+- kind: CronJob
+  apiVersion: batch/v1beta1
+  metadata:
+    name: ${NAME}
+  spec:
+    schedule: "${CRONTAB_CONFIG}"
+    concurrencyPolicy: Replace
+    jobTemplate:
+      spec:
+        template:
+          spec:
+            restartPolicy: OnFailure
+            hostIPC: true
+            containers:
+              - name: ${NAME}
+                imagePullPolicy: Always
+                image: "docker-registry.default.svc:5000/${SOURCE_GROUP_NAME}/${NAME}:latest"
+                env:
+                  - name: APPLOG_STDOUT_MODE
+                    value: 'true'
+                resources:
+                  limits:
+                    cpu: "${CPU_LIMIT}"
+                    memory: "${MEMORY_LIMIT}"
+                  requests:
+                    cpu: "${CPU_REQUEST}"
+                    memory: "${MEMORY_REQUEST}"
+                

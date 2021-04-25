@@ -1,0 +1,20 @@
+{
+	"page": ${pageIndex + 1},
+	"total": ${itemsResult.totalNum},
+	<#assign rownum=0 />
+	"rows":[
+		<#list itemsResult.consumerList as item >
+		<#if rownum &gt; 0>,</#if>
+		{
+			"consumerKey":"${item.consumerKey}",
+			"topicName":"${item.topicName}",
+			"consumerMode" : "${item.mode}",
+			"remark":"${item.consumerDesc?js_string}",
+			"hasSync":"<#if item.hasSync &gt; 0>已同步<#else>未同步</#if>",
+			"createTime":"${fromUnixTimestamp(item.createTimestamp)}",
+			"lastmodifyTime":"${fromUnixTimestamp(item.lastmodifyTimestamp)}"
+		}
+		<#assign rownum=rownum+1 />
+		</#list>
+	]
+}

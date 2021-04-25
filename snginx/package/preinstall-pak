@@ -1,0 +1,20 @@
+mkdir -p /data/snginx/log
+mkdir -p /data/snginx/etc
+
+chown -R epower /data/snginx
+chgrp -R epower /data/snginx
+
+mkdir -p /var/log/nginx/
+touch /var/log/nginx/error.log
+touch /var/log/nginx/access.log
+mkdir -p /var/cache/nginx/client_temp
+mkdir -p /var/cache/nginx/fastcgi_temp
+mkdir -p /var/cache/nginx/uwsgi_temp
+mkdir -p /var/cache/nginx/scgi_temp
+
+if [ $1 -eq 1 ];then
+	egrep "^nginx" /etc/passwd >/dev/null
+	if [ $? -ne 0 ];then
+		adduser --system --no-create-home nginx
+	fi
+fi

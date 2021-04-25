@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="${static_url}/CSS/common.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/flexigrid/css/flexigrid.css" type="text/css" />
+<link rel="stylesheet" href="${static_url}/JS/jquery-ui/jquery-ui-1.9.2.css" type="text/css" />
+<title>http配置选项</title>
+</head>
+<body>
+<div><textarea id="httpConfig" onkeydown="textareaTab(this)" style="font-size:14px;font-family:italic arial,sans-serif;width:90%;overflow:auto;margin:5px" rows="35">${config!}</textarea></div>
+<div>
+<input type="button" value="保存" onclick="javascript:saveConfig()" ></input>
+</div>
+</body>
+<script type="text/javascript" src="${static_url}/JS/jquery-1.7.2.min.js" ></script>
+<script type="text/javascript" src='${static_url}/JS/jquery.noty.min.js'></script>
+<script type="text/javascript">
+<#include "comm/WebComm.js">
+
+function textareaTab(area) {
+	if (window.event.keyCode === 9) {
+		var position= area.selectionStart + 1; 
+		area.value= area.value.substr(0, area.selectionStart)+ '\t' + area.value.substr(area.selectionStart);
+		area.selectionStart = position;
+		area.selectionEnd = position;
+		window.event.returnValue = false
+	}
+}
+
+function saveConfig() {
+	var httpConfig = $('#httpConfig').val();
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		timeout : 20000,
+		data: {
+			httpConfig : httpConfig
+		},
+		url : "${base_url}/WebManage/saveHttpConfig",
+		async : false,
+		success : function(result){
+			if(result.errorCode == 0){
+				showMsg("保存成功");
+			} else {
+				showMsg(result.errorMsg);
+			}
+		},
+		error : function(request, textStatus, errorThrown) {
+			if (request.status >= 500 || request.status == 404) {
+				showMsg('服务器繁忙，请重试');
+			} else {
+				showMsg('连接服务器失败, 请检查网络');
+			}
+		}
+	});
+}
+</script>
+</html>

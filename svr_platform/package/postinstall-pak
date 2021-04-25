@@ -1,0 +1,23 @@
+path_installed=$( cat /etc/profile | egrep PATH | egrep "/usr/local/soldier/svr_platform" | wc -l )
+if [ $path_installed -eq 0 ];then
+	echo >> /etc/profile
+	echo 'export PATH=$PATH:/usr/local/soldier/svr_platform' >> /etc/profile
+	echo >> /etc/profile
+fi
+
+
+
+chown -R epower /usr/local/soldier/svr_platform
+chgrp -R epower /usr/local/soldier/svr_platform
+chmod a+x /usr/local/soldier/svr_platform/*.sh
+chmod a+x /usr/local/soldier/svr_platform/func/*.sh
+
+cleanup_crontab_installed=$( crontab -l -u epower | egrep "/usr/local/soldier/svr_platform/cleanup.sh" | wc -l )
+if [ $cleanup_crontab_installed -eq 0 ];then
+        TMP_FILE=/tmp/original_crontab_epower_svr_platform
+        crontab -u epower -l > ${TMP_FILE}
+        echo "0 3 * * * /usr/local/soldier/svr_platform/cleanup.sh >> /usr/local/soldier/svr_platform/log/cleanup.sh.log 2>&1 " >> ${TMP_FILE}
+        crontab -u epower ${TMP_FILE}
+        rm -f ${TMP_FILE}
+fi
+

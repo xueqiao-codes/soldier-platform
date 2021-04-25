@@ -1,0 +1,15 @@
+
+chown -R epower /usr/local/soldier/route_agent
+chgrp -R epower /usr/local/soldier/route_agent
+chmod a+x /usr/local/soldier/route_agent/auto_restart.sh
+
+count=$( cat /etc/profile | egrep /usr/local/soldier/route_agent/bin | wc -l )
+if [ $count -eq 0 ];then
+	echo 'PATH=$PATH:/usr/local/soldier/route_agent/bin' >> /etc/profile
+fi
+
+if [ $1 -eq 2 ];then
+	printf "" > /usr/local/soldier/route_agent/data/version
+fi
+
+su - epower -c "/usr/local/soldier/route_agent/bin/route_agent_daemon.sh restart"

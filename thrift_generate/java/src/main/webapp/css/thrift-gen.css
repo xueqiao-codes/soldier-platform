@@ -1,0 +1,65 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    background: #e3e3e3;
+    margin: 0 auto;
+}
+
+.clear:after {
+    display: block;
+    content: " ";
+    clear: both;
+}
+
+.thrift {
+	max-width: 1000px;
+	margin: 0px auto;
+}
+
+.files > ul > li, .langs > ul > li {
+	list-style: none;
+}
+
+.file-list {
+    float: left;
+    margin: 0px 50px 0px 0px;
+}
+
+#keyword {
+    margin: 0px;
+}
+
+#server-file-list, #selected-file-list {
+    width: 450px;
+    height: 250px;
+    background: #FFF;
+    overflow: scroll;
+    padding: 10px;
+	margin: 15px 0px;
+    border-top: solid 1px #BBB;
+    border-left: solid 1px #BBB;
+    border-bottom: solid 1px #FFF;
+    border-right: solid 1px #FFF;
+}
+
+#lang-list {
+    margin: 15px auto;
+}
+
+#start-btn, #search {
+	font-size: 14px;
+    padding: 0 12px;
+    line-height: 24px;
+    background: #3e8acc;
+    color: #fff;
+    border: 1px solid #3e8acc;
+    border-radius: 2px;
+}
+
+#generate-result {
+	display: none;
+    margin: 5px auto;
+}

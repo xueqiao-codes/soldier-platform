@@ -1,0 +1,20 @@
+path_installed=$( cat /etc/profile | egrep PATH | egrep "/usr/local/soldier/mitty" | wc -l )
+if [ $path_installed -eq 0 ];then
+	echo >> /etc/profile
+	echo 'export PATH=$PATH:/usr/local/soldier/mitty' >> /etc/profile
+	echo >> /etc/profile
+fi
+
+chown -R epower /usr/local/soldier/mitty
+chgrp -R epower /usr/local/soldier/mitty
+chmod a+x /usr/local/soldier/mitty/auto_restart.sh
+chmod a+x /usr/local/soldier/mitty/mitty.sh
+
+cleanup_crontab_installed=$( crontab -l -u epower | egrep "/usr/local/soldier/mitty/cleanup.sh" | wc -l )
+if [ $cleanup_crontab_installed -eq 0 ];then
+        TMP_FILE=/tmp/original_crontab_epower_mitty
+        crontab -u epower -l > ${TMP_FILE}
+        echo "0 2 * * * /usr/local/soldier/mitty/cleanup.sh >> /usr/local/soldier/mitty/log/cleanup.sh.log 2>&1 " >> ${TMP_FILE}
+        crontab -u epower ${TMP_FILE}
+        rm -f ${TMP_FILE}
+fi

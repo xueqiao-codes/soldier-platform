@@ -1,0 +1,24 @@
+{
+	"page": ${pageIndex + 1},
+	"total": ${itemsResult.totalNum},
+	<#assign rownum=0 />
+	"rows":[
+		<#list itemsResult.machinesMap?keys as key >
+		<#if rownum &gt; 0>,</#if>
+		{
+			"hostName":"${itemsResult.machinesMap[key].hostName}",
+			"hostInnerIP":"${itemsResult.machinesMap[key].hostInnerIP}",
+			"hostAdmin":"${itemsResult.machinesMap[key].hostAdmin}",
+			"remark":"${itemsResult.machinesMap[key].hostDesc?js_string}",
+			"createTime":"${fromUnixTimestamp(itemsResult.machinesMap[key].createTimestamp)}",
+			"lastmodifyTime":"${fromUnixTimestamp(itemsResult.machinesMap[key].lastModifyTimestamp)}",
+			<#if itemsResult.machinesMap[key].relatedScreenURL?exists >
+			"relatedScreen" : "<a class=\"btn\" href=\"${itemsResult.machinesMap[key].relatedScreenURL!}\">查看监控</a>"
+			<#else>
+			"relatedScreen" : ""
+			</#if>
+		}
+		<#assign rownum=rownum+1 />
+		</#list>
+	]
+}

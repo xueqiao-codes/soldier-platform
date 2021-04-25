@@ -1,0 +1,43 @@
+#!/bin/bash -e
+#
+# S2I assemble script for the 'java_service_builder' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+# If the 'java_service_builder' assemble script is executed with the '-h' flag, print the usage.
+if [[ "$1" == "-h" ]]; then
+  exec /usr/libexec/s2i/usage
+fi
+
+# Restore artifacts from the previous build (if they exist).
+#
+if [ "$(ls -a /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring build artifacts..."
+  if [ -d /tmp/artifacts/build64_release ];then
+    echo "mv build64_release to /tmp/src"
+    mv /tmp/artifacts/build64_release /tmp/src/.
+    if [ -f /tmp/src/build64_release/.sconsign.dblite ];then
+      echo "mv .sconsign.dblite to /tmp/src"
+      mv /tmp/src/build64_release/.sconsign.dblite /tmp/src/.
+    fi
+  fi
+  
+fi
+
+echo "---> Installing application source..."
+echo "---> Current dir is $( pwd ), HOME is $HOME, change to /tmp/src..."
+
+pushd /tmp/src > /dev/null
+
+echo "--> Building..."
+chmod a+x build.sh
+./build.sh
+
+ln -sf $(pwd)/build64_release/message_broker /usr/local/sbin/message_broker
+
+popd > /dev/null
+
+echo "---> Assemble finished!!!"

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: qconf-agent
+  namespace: soldier-platform
+spec:
+  selector:
+    matchLabels:
+      name: qconf-agent
+  template:
+    metadata:
+      labels:
+        name: qconf-agent
+    spec:
+      hostIPC: true
+      tolerations:
+        - effect: NoExecute
+          key: xueqiao.quotation.access
+          operator: Equal
+          value: 'true'
+        - effect: NoExecute
+          key: xueqiao.quotation.race
+          operator: Equal
+          value: 'true'
+        - effect: NoExecute
+          key: xueqiao.trade.hosting
+          operator: Equal
+          value: 'true'
+      containers:
+      - name: qconf-agent
+        image: docker-registry.default.svc:5000/soldier-platform/qconf-agent:1.2.0.1
+        volumeMounts:
+        - name: scripts
+          mountPath: /usr/local/soldier/qconf_agent/script
+        - name: configs
+          mountPath: /data/configs/qconf/
+        resources:
+          limits:
+            cpu: "0.5"
+            memory: "100Mi"
+          requests:
+            cpu: 50m
+            memory: 50Mi
+      volumes:
+      - name: scripts
+        hostPath:
+          path: /usr/local/soldier/qconf_agent/script
+          type: DirectoryOrCreate
+      - name: configs
+        hostPath: 
+          path: /data/configs/qconf
+          type: DirectoryOrCreate

@@ -1,0 +1,45 @@
+#!/bin/bash -e
+#
+# S2I assemble script for the 'java_service_builder' image.
+# The 'assemble' script builds your application source so that it is ready to run.
+#
+# For more information refer to the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+# If the 'java_service_builder' assemble script is executed with the '-h' flag, print the usage.
+if [[ "$1" == "-h" ]]; then
+  exec /usr/libexec/s2i/usage
+fi
+
+# Restore artifacts from the previous build (if they exist).
+#
+if [ "$(ls -a /tmp/artifacts/ 2>/dev/null)" ]; then
+  echo "---> Restoring build artifacts..."
+fi
+
+echo "---> Installing application source..."
+echo "---> Current dir is $( pwd ), HOME is $HOME, change to /tmp/src..."
+
+mkdir -p /data/code/soldier/platform
+
+mv /tmp/src /data/code/soldier/platform/cpp_platform > /dev/null
+
+pushd /data/code/soldier/platform/cpp_platform > /dev/null
+
+chmod a+x install_dependencies.sh
+chmod a+x prepare_tools.sh
+chmod a+x build_thirdparty.sh
+
+echo "---> Building dependencies ..."
+./install_dependencies.sh
+
+echo "--> Prepare tools ..."
+./prepare_tools.sh
+
+echo "--> Build thridparty libraries ..."
+./build_thirdparty.sh all
+
+popd > /dev/null
+
+echo "---> Assemble finished!!!"

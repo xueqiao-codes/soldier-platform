@@ -1,0 +1,15 @@
+#!/bin/bash -e
+#
+# S2I run script for the 'java_service_builder' image.
+# The run script executes the server that runs your application.
+#
+# For more information see the documentation:
+#	https://github.com/openshift/source-to-image/blob/master/docs/builder_image.md
+#
+
+if [ "z" != "z${EXPORT_NGINXBIN_PATH}" ];then
+    cp -f /usr/local/nginx/sbin/nginx ${EXPORT_NGINXBIN_PATH}
+    cp -f /usr/local/luajit/lib/libluajit-5.1.so.2 ${EXPORT_NGINXBIN_PATH}
+fi
+
+/usr/local/nginx/sbin/nginx -g 'daemon off;' -c /etc/nginx/nginx.conf

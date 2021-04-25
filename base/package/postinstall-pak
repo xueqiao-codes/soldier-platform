@@ -1,0 +1,35 @@
+#user_exist=$( cat /etc/passwd | awk -F ':' '{print $1}' | egrep epower | wc -l )
+#if [ $user_exist -eq 0 ];then
+#        useradd -p epower@user epower
+#fi
+
+chown -R epower /usr/local/soldier
+chgrp -R epower /usr/local/soldier
+chmod a+x /usr/local/soldier/auto_restart.sh
+mkdir -p /data/applog
+chmod 777 /data/applog
+
+crontab_installed=$( crontab -l -u epower | egrep "/usr/local/soldier/auto_restart.sh" | wc -l )
+if [ $crontab_installed -eq 0 ];then
+        TMP_FILE=/tmp/original_crontab_epower
+        crontab -u epower -l > ${TMP_FILE}
+        echo "" >> ${TMP_FILE}
+        echo "# all soldier platform components will auto restart here"  >> ${TMP_FILE}
+        echo "*/1 * * * * /usr/local/soldier/auto_restart.sh > /dev/null 2>&1 " >> ${TMP_FILE}
+        echo "" >> ${TMP_FILE}
+        crontab -u epower ${TMP_FILE}
+        rm -f ${TMP_FILE}
+fi
+
+logger_crontab_installed=$( crontab -l -u epower | egrep "/usr/local/soldier/bin/daily_logger_close.sh" | wc -l )
+if [ $logger_crontab_installed -eq 0 ];then
+        TMP_FILE=/tmp/original_crontab_epower_logger
+        crontab -u epower -l > ${TMP_FILE}
+        echo "" >> ${TMP_FILE}
+        echo "# close logger for /data/applog"  >> ${TMP_FILE}
+        echo "0 2 * * * /usr/local/soldier/bin/daily_logger_close.sh > /dev/null 2>&1 " >> ${TMP_FILE}
+        echo "" >> ${TMP_FILE}
+        crontab -u epower ${TMP_FILE}
+        rm -f ${TMP_FILE}
+fi
+

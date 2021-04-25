@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvzookeeper-data
+  labels:
+    pv.bind: zookeeper-data
+spec:
+  capacity:
+    storage: 1.5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: /data
+    server: 3efbe4af91-uax26.cn-shanghai.nas.aliyuncs.com

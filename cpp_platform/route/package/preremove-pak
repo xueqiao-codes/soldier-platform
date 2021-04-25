@@ -1,0 +1,7 @@
+if [ $1 -eq 0 ];then
+	rm -f /usr/local/soldier/route_agent/auto_restart.sh
+
+	/usr/local/soldier/route_agent/bin/route_agent_daemon.sh stop
+	
+	sed -i '/\/usr\/local\/soldier\/route_agent\/bin$/d' /etc/profile
+fi

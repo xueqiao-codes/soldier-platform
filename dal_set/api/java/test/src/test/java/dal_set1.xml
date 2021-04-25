@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dalset>
+<hosts>
+	<host name="test0" ip="192.168.0.254" port="3306" desc="DB Test 0" />
+	<host name="test1" ip="192.168.0.1" port="3308" desc="DB Test 1" />
+	<host name="test2" ip="192.168.0.2" port="3309" desc="DB Test 2" />
+	<host name="test3" ip="192.168.0.3" port="3310" desc="DB Test 3" />
+</hosts>
+<users>
+	<user id="testuser" name="test" password="test@test" desc="test" />
+</users>
+<dbInstances>
+	<db name="user" drive="mysql" rolename="test" desc="user test" >
+		<sets>
+			<set index="0" >
+				<master host="test1" />
+				<slave host="test2" index="0" />
+			</set>
+			<set index="1">
+				<master host="test0" weight="0" />
+				<slave host="test1" index="0" weight="1000"/>
+				<slave host="test2" index="1" weight="500"/>
+				<slave host="test3" index="2" weight="10"/>
+			</set>
+		</sets>
+		<tables>
+			<table prefix="tuser_place_" sliceNum="1024" fillZero="false" desc="test" />
+			<table prefix="tfill_zero_" sliceNum="128" fillZero="true" desc="test" />
+			<table prefix="tvariable_table_" 
+				sliceNum="${slicenum}" fillZero="${fillZero}" desc="hehe" />
+		</tables>
+	</db>
+</dbInstances>
+<relations>
+	<relation serviceName="800" roleName="test" userId="testuser"
+		 dbType="NoType" desc="relation" />
+	<relation serviceName="800_special" roleName="test" userId="testuser"
+		 dbType="Master" desc="specical relation" />
+</relations>
+</dalset>

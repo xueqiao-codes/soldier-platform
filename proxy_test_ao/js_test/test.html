@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Thrift Robot js client Test</title>
+</head>
+<body>
+<h1>Thrift接口测试~</h1>
+<textarea id="id_msg">你好</textarea>
+<br/>
+<button onclick="javascripts:btn_msg();">发送</button>
+
+<!-- thrift自身的库 -->
+<script src="thrift.js" type="text/javascript"></script>
+
+<!-- thrift生成 -->
+<script src="proxy_test_ao_types.js" type="text/javascript"></script> 
+<script src="proxy_test_ao.js" type="text/javascript"></script>
+<script src="comm_types.js" type="text/javascript"></script>
+
+<script src="jquery-3.3.1.min.js" type="text/javascript"></script>
+
+<script>
+    var transport = new Thrift.Transport("");
+    var protocol = new Thrift.Protocol(transport);
+    var client = new proxy_test_aoClient(protocol);
+
+    var nameElement = document.getElementById("id_msg");
+    console.log(client);
+
+    function btn_msg() {
+      var echoTypes = new EchoTypes();
+	  echoTypes.bool_field = true;
+	  echoTypes.string_field = document.getElementById("id_msg").value;
+	  echoTypes.int64_field = 64;
+	  echoTypes.int32_field = 32;
+	  echoTypes.double_field = 0.123;
+	  
+	  echoTypes.list_field = [];
+	  echoTypes.list_field.push("one");
+	  echoTypes.list_field.push("two");
+	  
+	  echoTypes.map_field = new Map();
+	  echoTypes.map_field["abc"] = "123";
+	  
+	  // 这里的set只能用List
+	  echoTypes.set_field = ["1", "2", "3", "1"]
+	  
+	  echoTypes.struct_field = new EchoListResult()
+	  echoTypes.struct_field.contentList = ["content1", "content2"]
+	  
+	  var echoTypeList = [ echoTypes, echoTypes ];
+    
+    $.ajax({
+      url: "http://devproxy.xueqiao.cn?servant=proxy_test_ao",
+      data: client.send_testEchoTypesList(new PlatformArgs(), echoTypeList),
+      type: "POST",
+      cache: false,
+      contentType: "application/json",
+      dataType: "json",
+	  beforeSend: function(XMLHttpRequest) {
+        XMLHttpRequest.setRequestHeader(
+          "X-Oa-User-Id", "123"
+        )
+      },
+
+      success: function(res){
+        transport.setRecvBuffer(res);
+		try {
+			alert(JSON.stringify(client.recv_testEchoTypesList()));
+		} catch(ei) {
+			alert(ei.errorCode + ", " + ei.errorMsg);
+		}
+      },
+      error: function() { alert("error callback"); },
+      complete: function() {
+        //alert("completed");
+      }
+    });
+    }    
+</script>
+</body>
+</html>

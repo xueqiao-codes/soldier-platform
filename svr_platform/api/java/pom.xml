@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.soldier.platform</groupId>
+  <artifactId>libsvr_platform</artifactId>
+  <version>1.7</version>
+  
+  <dependencies>
+        <dependency>
+            <groupId>org.soldier</groupId>
+            <artifactId>libsoldier_base</artifactId>
+            <version>1.3</version>
+        </dependency>
+  
+		<dependency>
+			<groupId>org.soldier.platform</groupId>
+			<artifactId>libroute_agent</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.thrift</groupId>
+			<artifactId>libthrift</artifactId>
+			<version>0.9.1.3</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+			<optional>true</optional>
+		</dependency>
+		
+		<dependency>
+            <groupId>org.soldier.platform</groupId>
+            <artifactId>libattr</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+		
+		<dependency>
+            <groupId>com.kohlschutter.junixsocket</groupId>
+            <artifactId>junixsocket-native-common</artifactId>
+            <version>2.0.4</version>
+            <optional>true</optional>
+        </dependency>
+            
+  </dependencies>
+ 
+  <build>
+    <sourceDirectory>src/</sourceDirectory>
+	<plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>        
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+		  <compilerArgument>-Xlint:all</compilerArgument>
+		  <showWarnings>true</showWarnings>
+		  <encoding>utf-8</encoding>
+		  <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <distributionManagement>    
+    <repository>    
+        <id>maven_server</id>    
+        <name>Soldier Release Repository</name>    
+        <url>http://maven.xueqiao.cn/nexus/content/repositories/soldier_release/</url>    
+    </repository>
+    
+    <snapshotRepository>    
+      	<id>maven_server</id>    
+      	<name>Nexus Snapshot Repository</name>    
+      	<url>http://maven.xueqiao.cn/nexus/content/repositories/soldier_snapshots/</url>    
+    </snapshotRepository>    
+     
+  </distributionManagement> 
+</project>
